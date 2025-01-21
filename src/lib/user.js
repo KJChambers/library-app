@@ -1,5 +1,5 @@
 // Use ECMAScript (ES) import syntax
-import { getDatabase } from '../db.js';
+import { getDatabase } from './db.js';
 
 async function createUser(userData) {
     const db = await getDatabase();
@@ -23,6 +23,14 @@ async function getUserByUsername(username) {
     return user;
 }
 
+async function getUserByEmail(email) {
+    const db = await getDatabase();
+    const usersCollection = db.collection('users');
+
+    const user = await usersCollection.findOne({ email });
+    return user;
+}
+
 async function updateUserBooks(userId, bookData) {
     const db = await getDatabase();
     const usersCollection = db.collection('users');
@@ -43,4 +51,4 @@ async function getUserBooks(userId) {
     return user ? user.books : [];
 }
 
-export { createUser, getUserByUsername, updateUserBooks, getUserBooks };
+export { createUser, getUserByUsername, getUserByEmail, updateUserBooks, getUserBooks };

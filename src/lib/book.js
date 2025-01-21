@@ -1,5 +1,5 @@
 // Use ECMAScript (ES) import syntax
-import { getDatabase, ObjectId } from '../db.js';
+import { getDatabase, ObjectId } from './db.js';
 
 async function createBook(bookData) {
     const db = await getDatabase();
