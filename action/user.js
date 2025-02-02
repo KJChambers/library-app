@@ -188,6 +188,42 @@ async function forgotPassword(prevState, formData) {
 
     const resend = new Resend(process.env.RESEND_KEY);
 
+    if (!user.password) {
+        try {
+            const { data, error } = await resend.emails.send({
+                from: 'The Book Chamber <no-reply@book-chamber.com>',
+                to: [user.email],
+                subject: 'Password Reset',
+                react: <>
+                    <h1>Hello, {user.firstName}</h1>
+                    <p>You don't have a password stored in our database. This usually means you logged in with Google. If you are unable to login with Google, contact kieranc0808@gmail.com</p>
+                </>
+            });
+    
+            if (error) {
+                errors.push(error);
+                return { 
+                    errors,
+                    payload: formData
+                };
+            }
+    
+            return { 
+                payload: formData,
+                success: true
+            };
+        } catch (error) {
+            errors.push(error);
+        }
+    
+        if (errors.length > 0) {
+            return { 
+                errors,
+                payload: formData
+            };
+        }
+    }
+
     try {
         const { data, error } = await resend.emails.send({
             from: 'The Book Chamber <no-reply@book-chamber.com>',
