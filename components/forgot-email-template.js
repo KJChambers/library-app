@@ -2,21 +2,13 @@ import generateToken from "@/lib/generate-token";
 
 export default function EmailTemplate({ firstName, email }) {
     const token = generateToken({ email });
-    const url = `http://localhost:3000/login/reset/${token}`;
+    const url = `https://wwwbook-chamber.com/login/reset/${token}`;
     return (
         <div>
             <h1>Hello, {firstName}!</h1>
             <p>You (or, someone) requested a password reset link for the email: {email}</p>
             <a 
-                href={url} 
-                style="
-                    background-color: #7f22fe;
-                    cursor: pointer;
-                    color: #ede9fe;
-                    font-weight: 600;
-                    padding: 12px;
-                    border-radius: 6px;
-                "
+                href={url}
             >
                 Click here to reset
             </a>
