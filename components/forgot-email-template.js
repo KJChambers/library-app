@@ -2,7 +2,7 @@ import generateToken from "@/lib/generate-token";
 
 export default function EmailTemplate({ firstName, email }) {
     const token = generateToken({ email });
-    const url = `https://wwwbook-chamber.com/login/reset/${token}`;
+    const url = `https://www.book-chamber.com/login/reset/${token}`;
     return (
         <div>
             <h1>Hello, {firstName}!</h1>
