@@ -19,7 +19,7 @@
 - Main Home Page
 - Library Functionality (a lot of stuff here!)
 
-## Development Story
+# Development Story
 
 The site is still being built, however we've made significant strides already. I'd like to start out by saying that I am one person making this site, so please bear with me on this :)
 

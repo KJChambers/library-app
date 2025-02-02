@@ -173,7 +173,7 @@ async function forgotPassword(prevState, formData) {
 
     await connectDB();
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select("+password");
 
     if (!user) {
         errors.push("No user exists with this email.");
@@ -188,15 +188,16 @@ async function forgotPassword(prevState, formData) {
 
     const resend = new Resend(process.env.RESEND_KEY);
 
-    if (!user.password) {
+    if (!(user.password)) {
         try {
             const { data, error } = await resend.emails.send({
                 from: 'The Book Chamber <no-reply@book-chamber.com>',
                 to: [user.email],
                 subject: 'Password Reset',
                 react: <>
-                    <h1>Hello, {user.firstName}</h1>
+                    <h1>Hello, {user.firstName}!</h1>
                     <p>You don't have a password stored in our database. This usually means you logged in with Google. If you are unable to login with Google, contact kieranc0808@gmail.com</p>
+                    <small>If you did not request this email, you can ignore it. This is not part of a subscriber list.</small>
                 </>
             });
     
@@ -229,7 +230,7 @@ async function forgotPassword(prevState, formData) {
             from: 'The Book Chamber <no-reply@book-chamber.com>',
             to: [user.email],
             subject: 'Password Reset',
-            react: EmailTemplate({ firstName: user.firstName })
+            react: EmailTemplate({ firstName: user.firstName, email: user.email })
         });
 
         if (error) {

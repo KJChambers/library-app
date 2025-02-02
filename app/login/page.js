@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getSession } from "@/lib/get-session";
 import { redirect } from "next/navigation";
 import { BookmarkIcon } from "@heroicons/react/24/outline";
-import LoginForm from "@/components/login-form";
+import LoginForm from "@/components/forms/login-form";
 import GoogleButton from "@/components/google";
 
 export default async function LoginPage() {
