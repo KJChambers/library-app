@@ -8,7 +8,6 @@ import { signIn } from "@/lib/auth";
 import { compare, hash } from "bcryptjs";
 import EmailTemplate from "@/components/forgot-email-template";
 import { Resend } from "resend";
-import { doc } from "prettier";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 async function login(prevState, formData) {
