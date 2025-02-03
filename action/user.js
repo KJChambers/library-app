@@ -8,6 +8,8 @@ import { signIn } from "@/lib/auth";
 import { compare, hash } from "bcryptjs";
 import EmailTemplate from "@/components/forgot-email-template";
 import { Resend } from "resend";
+import { doc } from "prettier";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 async function login(prevState, formData) {
     const email = formData.get("email");
@@ -82,7 +84,7 @@ async function register(prevState, formData) {
     const firstName = formData.get("firstname").trim();
     const lastName = formData.get("lastname").trim();
     const username = formData.get("username").trim().toLowerCase();
-    const email = formData.get("email").trim();
+    const email = formData.get("email").trim().toLowerCase();
     const password = formData.get("password").trim();
 
     let errors = [];
@@ -156,7 +158,7 @@ async function register(prevState, formData) {
 }
 
 async function forgotPassword(prevState, formData) {
-    const email = formData.get("email");
+    const email = formData.get("email").toLowerCase();
 
     let errors = [];
     
@@ -197,6 +199,7 @@ async function forgotPassword(prevState, formData) {
                 react: <>
                     <h1>Hello, {user.firstName}!</h1>
                     <p>You don't have a password stored in our database. This usually means you logged in with Google. If you are unable to login with Google, contact kieranc0808@gmail.com</p>
+                    <br />
                     <small>If you did not request this email, you can ignore it. This is not part of a subscriber list.</small>
                 </>
             });
@@ -257,10 +260,104 @@ async function forgotPassword(prevState, formData) {
     }
 }
 
+async function resetPassword(prevState, formData) {
+    const email = formData.get("email");
+    const password = formData.get("password");
+    const password2 = formData.get("password2");
+
+    let errors = [];
+
+    if (!password || !password2) {
+        errors.push("Please enter a new password.");
+    }
+
+    if (password !== password2) {
+        errors.push("Passwords do not match.");
+    }
+
+    if (password.length < 8 || password.length > 16) {
+        errors.push("Password must be 8-16 characters.");
+    }
+
+    let pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/
+    if (!pattern.test(password)) {
+        errors.push("Password must include a number, an uppercase letter and a lowercase letter.");
+    }
+
+    pattern = /^[a-zA-Z0-9!@#$^&*]+$/
+    if (!pattern.test(password)) {
+        errors.push("Accepted password special characters: ! @ # $ ^ & *");
+    }
+
+    if (errors.length > 0) {
+        return { 
+            errors,
+            payload: formData
+        };
+    }
+
+    const user = await User.findOne({ email }).select("+password");
+    const isMatch = await compare(password, user.password);
+
+    if (isMatch) {
+        errors.push("Password must not be the same as your old password.");
+    }
+
+    if (errors.length > 0) {
+        return { 
+            errors,
+            payload: formData
+        };
+    }
+
+    const resend = new Resend(process.env.RESEND_KEY);
+
+    try {
+
+        user.password = await hash(password, 12);
+        await user.save();
+
+        const { data, error } = await resend.emails.send({
+            from: 'The Book Chamber <no-reply@book-chamber.com>',
+            to: [user.email],
+            subject: 'Password Changed',
+            react: <>
+                <h1>Hello, {user.firstName}!</h1>
+                <p>Your password has been successfully changed! If you didn't request this change, immediately contact kieranc0808@gmail.com</p>
+                <br />
+                <small>This is not part of a subscriber list.</small>
+            </>
+        });
+
+        if (error) {
+            errors.push(error.message);
+            return {
+                errors,
+                payload: formData
+            };
+        }
+
+        redirect("/login");
+
+    } catch (error) {
+        if (isRedirectError(error)) {
+            throw error;
+        }
+        errors.push(error.message);
+    }
+
+    if (errors.length > 0) {
+        return { 
+            errors,
+            payload: formData
+        };
+    }
+}
+
 async function fetchAllUsers() {
     await connectDB();
     const users = await User.findOne({});
     return users;
 }
 
-export { register, login, forgotPassword, fetchAllUsers };
+export { register, login, forgotPassword, resetPassword, fetchAllUsers };
