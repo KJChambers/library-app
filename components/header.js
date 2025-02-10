@@ -7,12 +7,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { signOut } from "@/lib/auth";
 import { User } from "@/models/user";
+import connectDB from "@/lib/db";
 
 export default async function Header() {
     const session = await getSession();
     const user = session?.user;
 	let userData = null;
 	if (user) {
+		await connectDB();
 		userData = await User.findOne({ email: user.email });
 	}
 
