@@ -3,9 +3,11 @@ import { User } from "@/models/user";
 import { notFound } from "next/navigation";
 import pfp from "@/public/obi-wan.jpg";
 import Image from "next/image";
+import connectDB from "@/lib/db";
 
 export default async function ProfilePage({ params }) {
     const { username } = await params;
+    await connectDB();
     const profileData = await User.findOne({ username });
 
     if (!profileData) {
