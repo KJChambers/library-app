@@ -2,11 +2,10 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
-import { useFormStatus } from "react-dom";
+import LoginFormSubmit from "./login-form-submit";
 
 export default function LoginForm({ action }) {
     const [state, formAction] = useActionState(action, {});
-    const status = useFormStatus();
 
     return (
         <form action={formAction} className="space-y-6">
@@ -59,15 +58,7 @@ export default function LoginForm({ action }) {
 				)}
             </div>
             <div>
-                {!status.pending ?
-                    <button
-                        type="submit"
-                        className="cursor-pointer flex w-full justify-center rounded-md bg-violet-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-violet-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600"
-                    >
-                        Log in
-                    </button>
-                    : <span>Logging in...</span>
-                }
+                <LoginFormSubmit />
             </div>
         </form>
     );

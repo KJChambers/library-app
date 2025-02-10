@@ -1,11 +1,10 @@
 'use client';
 
 import { useActionState } from "react";
-import { useFormStatus } from "react-dom";
+import RegisterFormSubmit from "./register-form-submit";
 
 export default function RegisterForm({ action }) {
     const [state, formAction] = useActionState(action, {});
-    const status = useFormStatus();
 
     return (
         <form action={formAction} className="space-y-6">
@@ -103,16 +102,7 @@ export default function RegisterForm({ action }) {
 				)}
             </div>
             <div>
-                {!status.pending ? 
-                    <button
-                        type="submit"
-                        className="flex cursor-pointer w-full justify-center rounded-md bg-violet-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-violet-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600"
-                    >
-                        Register
-                    </button>
-                    : <span>Registering...</span>
-                }
-                
+                <RegisterFormSubmit />
             </div>
         </form>
     );

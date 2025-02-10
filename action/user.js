@@ -278,7 +278,7 @@ async function resetPassword(prevState, formData) {
         errors.push("Password must be 8-16 characters.");
     }
 
-    let pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/
+    let pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{1,}$/
     if (!pattern.test(password)) {
         errors.push("Password must include a number, an uppercase letter and a lowercase letter.");
     }

@@ -6,10 +6,15 @@ import pfp from '@/public/obi-wan.jpg';
 import Link from "next/link";
 import Image from "next/image";
 import { signOut } from "@/lib/auth";
+import { User } from "@/models/user";
 
 export default async function Header() {
     const session = await getSession();
     const user = session?.user;
+	let userData = null;
+	if (user) {
+		userData = await User.findOne({ email: user.email });
+	}
 
 	let pages = [];
 
@@ -80,18 +85,10 @@ export default async function Header() {
 									>
 										<MenuItem>
 											<Link 
-												href="/"
+												href={"/profile/" + userData.username}
 												className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
 											>
 												Your Profile
-											</Link>
-										</MenuItem>
-										<MenuItem>
-											<Link 
-												href="/"
-												className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
-											>
-												Settings
 											</Link>
 										</MenuItem>
 										<MenuItem>
