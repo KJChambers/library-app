@@ -1,5 +1,5 @@
 import { forgotPassword } from "@/action/user";
-import ForgotPasswordForm from "@/components/forms/forgot-password-form";
+import ForgotPasswordForm from "@/components/forms/password/forgot-password-form";
 import { getSession } from "@/lib/get-session";
 import { BookmarkIcon } from "@heroicons/react/24/outline";
 

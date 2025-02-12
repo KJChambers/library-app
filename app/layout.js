@@ -2,7 +2,7 @@ import Header from "@/components/header";
 import "./globals.css";
 
 export const metadata = {
-  title: "Library App",
+  title: "Book Chamber",
   description: "A Library app created to store and edit book data",
 };
 

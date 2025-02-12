@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { BookmarkIcon } from '@heroicons/react/24/outline';
 import { User } from '@/models/user';
-import ResetPasswordForm from '@/components/forms/reset-password-form';
+import ResetPasswordForm from '@/components/forms/password/reset-password-form';
 import { resetPassword } from '@/action/user';
 
 export default async function PasswordResetPage({ params }) {
