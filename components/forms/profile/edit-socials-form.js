@@ -9,7 +9,7 @@ export default function EditSocialsForm({ action, userData }) {
     return (
         <form action={formAction} className="space-y-12 px-0 sm:px-44 pb-12">
             <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                <input type="hidden" id="email" name="email" defaultValue={userData.email} />
+                <input type="hidden" id="socialsemail" name="socialsemail" defaultValue={userData.email} />
                 <div className="sm:col-span-full md:col-span-5 lg:col-span-4">
                     <label htmlFor="facebook" className="block text-sm/6 font-medium text-violet-950 dark:text-violet-100">
                         Facebook

@@ -448,7 +448,7 @@ async function updateUserSocials(prevState, formData) {
     const linkedin = formData.get("linkedin");
     const instagram = formData.get("instagram");
     const github = formData.get("github");
-    const email = formData.get("email");
+    const email = formData.get("socialsemail");
 
     let errors = [];
 

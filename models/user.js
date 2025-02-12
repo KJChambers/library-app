@@ -9,10 +9,10 @@ const userSchema = new mongoose.Schema({
     imageUrl: String,
     bio: { type: String, default: "" },
     socials: {
-        facebook: String,
-        linkedin: String,
-        instagram: String,
-        github: String
+        facebook: { type: String, default: "" },
+        linkedin: { type: String, default: "" },
+        instagram: { type: String, default: "" },
+        github: { type: String, default: "" }
     },
     authProviderId: String,
 });

@@ -17,7 +17,7 @@ export default function RegisterForm({ action }) {
                         id="firstname"
                         name="firstname"
                         type="text"
-                        autoComplete="name"
+                        autoComplete="given-name"
                         placeholder="Kieran"
                         defaultValue={(state.payload?.get("firstname") || "")}
                         className="block w-full rounded-md bg-white dark:bg-slate-500 px-3 py-1.5 text-base text-violet-950 dark:text-violet-100 outline-gray-300 placeholder:text-gray-400 dark:placeholder:text-violet-100/50 focus:outline-2 focus:-outline-offset-2 focus:outline-violet-600 dark:focus:outline-violet-400 sm:text-sm/6 "
