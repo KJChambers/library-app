@@ -10,12 +10,14 @@
 - DB connection using MongoDB
 - Google OAuth
 - Deployment through Vercel
+- Forgot Password functionality
+- Profile Page
+- Edit profile functionality
 
 **Left to Do**
-- Forgot Password functionality
+- Update profile picture
+- Update email
 - Dashboard Page
-- Profile Page
-- Settings Page
 - Main Home Page
 - Library Functionality (a lot of stuff here!)
 
@@ -63,4 +65,4 @@ My solution? Which totally works, by the way... Remove the middleware. Just dele
 
 ## The Future
 
-Now, time to work out how to use jwt to set up a forgot password flow...
+I've worked on a lot of stuff since, and it's been great fun. I look forward to the future production of this project.

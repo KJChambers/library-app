@@ -2,7 +2,7 @@ import { getSession } from "@/lib/get-session";
 import { redirect } from "next/navigation";
 import { BookmarkIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { register } from "@/action/user";
+import register from "@/action/register";
 import RegisterForm from "@/components/forms/register/register-form";
 import GoogleButton from "@/components/google";
 

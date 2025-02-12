@@ -1,4 +1,4 @@
-import { updateUserProfile, updateUserSocials } from "@/action/user";
+import { updateUserProfile, updateUserSocials } from "@/action/update-profile";
 import EditProfileForm from "@/components/forms/profile/edit-profile-form";
 import EditSocialsForm from "@/components/forms/profile/edit-socials-form";
 import connectDB from "@/lib/db";
