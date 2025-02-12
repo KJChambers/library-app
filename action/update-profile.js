@@ -6,119 +6,102 @@ import { redirect } from "next/navigation";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 async function updateUserProfile(prevState, formData) {
-    const firstName = formData.get("firstName");
-    const lastName = formData.get("lastName");
-    const email = formData.get("email");
-    const username = formData.get("username");
-    let bio = formData.get("bio");
+    const requiredFields= ["firstName", "lastName", "username"];
+    const userData = Object.fromEntries(requiredFields.map(field => [field, formData.get(field)]));
+    userData.bio = formData.get("bio") || "";
+    userData.email = formData.get("email");
 
     let errors = [];
 
-    if (!firstName || !lastName || !username) {
+    if (requiredFields.some(field => !userData[field])) {
         errors.push("Please enter all required details, marked with *.")
     }
 
-    if (!bio) {
-        bio = "";
-    }
-
-    if (username.length < 4 || username.length > 16) {
+    if (userData.username.length < 4 || userData.username.length > 16) {
         errors.push("Username must be 4-16 characters.");
     }
 
-    let pattern = /^[a-z0-9._]+$/;
-    if (!pattern.test(username)) {
+    const usernamePattern = /^[a-z0-9._]+$/;
+    if (!usernamePattern.test(userData.username)) {
         errors.push("Username can only contain letters, numbers, dots or underscores.");
     }
 
-    if (username.startsWith('.') || username.startsWith('_')) {
-        errors.push("Username cannot start with a dot or underscore.");
+    if (/^[._]|[._]$/.test(userData.username)) {
+        errors.push("Username cannot start or end with a dot or underscore.");
     }
 
-    if (username.endsWith('.') || username.endsWith('_')) {
-        errors.push("Username cannot end with a dot or underscore.");
-    }
-
-    if (bio.length > 120) {
+    if (userData.bio.length > 120) {
         errors.push("Bio must be under 120 characters.");
     }
 
     if (errors.length > 0) {
-        return { 
-            errors,
-            payload: formData
-        };
+        return { errors, payload: formData };
     }
 
     await connectDB();
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: userData.email });
 
-    if (
-        user.username === username &&
-        user.firstName === firstName &&
-        user.lastName === lastName &&
-        user.bio === bio
-    ) {
-        return {
-            payload: formData
-        };
+    if (requiredFields.every(field => user[field] === userData[field]) && user.bio === userData.bio) {
+        return { payload: formData };
+    }
+
+    if (user.username !== userData.username) {
+        const existingUser = await User.findOne({ username: userData.username });
+        if (existingUser) {
+            errors.push("Username is already taken.")
+        }
+    }
+
+    if (errors.length > 0) {
+        return { errors, payload: formData };
     }
 
     try {
-        if (user.firstName !== firstName) {
-            user.firstName = firstName;
-        }
-        if (user.lastName !== lastName) {
-            user.lastName = lastName;
-        }
-        if (user.username !== username) {
-            user.username = username;
-        }
-        if (user.bio !== bio) {
-            user.bio = bio;
-        }
-        await user.save();
+        let updated = false;
 
-        redirect(`/profile/${username}`);
-    } catch (error) {
-        if (isRedirectError(error)) {
-            throw error;
+        requiredFields.concat("bio").forEach(field => {
+            if (user[field] !== userData[field]) {
+                user[field] = userData[field];
+                updated = true;
+            }
+        });
+
+        if (updated) {
+            await user.save();
+            redirect(`/profile/${user.username}`);
         }
+    } catch (error) {
+        if (isRedirectError(error)) throw error;
         errors.push(error.message);
     }
 
     if (errors.length > 0) {
-        return { 
-            errors,
-            payload: formData
-        };
+        return { errors, payload: formData };
     }
 }
 
 async function updateUserSocials(prevState, formData) {
-    const facebook = formData.get("facebook");
-    const linkedin = formData.get("linkedin");
-    const instagram = formData.get("instagram");
-    const github = formData.get("github");
     const email = formData.get("socialsemail");
 
     let errors = [];
+    const socialPlatforms = {
+        facebook: ["facebook.com", "fb.com"],
+        linkedin: ["linkedin.com"],
+        instagram: ["instagram.com"],
+        github: ["github.com"]
+    };
 
-    if (facebook && !facebook.includes("facebook.com") && !facebook.includes("fb.com")) {
-        errors.push("Invalid Facebook URL");
-    }
-
-    if (linkedin && !linkedin.includes("linkedin.com")) {
-        errors.push("Invalid LinkedIn URL");
-    }
-
-    if (instagram && !instagram.includes("instagram.com")) {
-        errors.push("Invalid Instagram URL");
-    }
-
-    if (github && !github.includes("github.com")) {
-        errors.push("Invalid GitHub URL");
-    }
+    Object.entries(socialPlatforms).forEach(([platform, validDomains]) => {
+        const url = formData.get(platform);
+        if (url) {
+            if (!validDomains.some(domain => url.includes(domain))) {
+                errors.push(`Invalid ${platform.charAt(0).toUpperCase() + platform.slice(1)} URL`);
+            }
+            if (!url.startsWith("https://")) {
+                errors.push(`Please ensure ${platform.charAt(0).toUpperCase() + platform.slice(1)} URL uses https://`);
+            }
+        }
+    });
 
     if (errors.length > 0) {
         return { 
@@ -130,37 +113,28 @@ async function updateUserSocials(prevState, formData) {
     await connectDB();
     const user = await User.findOne({ email });
 
-    if (
-        user.socials.facebook === facebook &&
-        user.socials.linkedin === linkedin &&
-        user.socials.instagram === instagram &&
-        user.socials.github === github
-    ) {
-        return {
-            payload: formData
-        }
+    const socials = ["facebook", "linkedin", "instagram", "github"];
+
+    if (socials.every(platform => user.socials[platform] === formData.get(platform))) {
+        return { payload: formData };
     }
 
     try {
-        if (user.socials.facebook !== facebook) {
-            user.socials.facebook = facebook;
-        }
-        if (user.socials.linkedin !== linkedin) {
-            user.socials.linkedin = linkedin;
-        }
-        if (user.socials.instagram !== instagram) {
-            user.socials.instagram = instagram;
-        }
-        if (user.socials.github !== github) {
-            user.socials.github = github;
-        }
-        user.save();
+        let updated = false;
+        socials.forEach(platform => {
+            const newValue = formData.get(platform);
+            if (user.socials[platform] !== newValue) {
+                user.socials[platform] = newValue;
+                updated = true;
+            }
+        });
 
-        redirect(`/profile/${user.username}`);
-    } catch (error) {
-        if (isRedirectError(error)) {
-            throw error;
+        if (updated) {
+            user.save();
+            redirect(`/profile/${user.username}`);
         }
+    } catch (error) {
+        if (isRedirectError(error)) throw error;
         errors.push(error.message);
     }
 

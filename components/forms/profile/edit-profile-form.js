@@ -8,7 +8,7 @@ export default function EditProfileForm({ action, userData }) {
     const [bio, setBio] = useState(userData.bio);
 
     return (
-        <form action={formAction} className="space-y-12 px-0 sm:px-44 pb-12 border-b border-gray-900/20">
+        <form action={formAction} className="space-y-12 px-0 sm:px-44 pb-12 border-b border-gray-900/20 dark:border-gray-400/50">
             <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                 <input type="hidden" id="email" name="email" defaultValue={userData.email} />
                 <div className="sm:col-span-3">
@@ -45,23 +45,20 @@ export default function EditProfileForm({ action, userData }) {
                     </div>
                 </div>
 
-                <div className="sm:col-span-full md:col-span-5 lg:col-span-4">
+                <div className="sm:col-span-4">
                     <label htmlFor="username" className="block text-sm/6 font-medium text-violet-950 dark:text-violet-100 after:ml-0.5 after:text-red-500 after:content-['*']">
                         Username
                     </label>
                     <div className="mt-2">
-                        <div className="flex items-center rounded-md bg-slate-100 dark:bg-slate-500 pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-violet-600 dark:focus-within:outline-violet-400">
-                            <div className="shrink-0 text-base text-gray-500 dark:text-gray-300/70 select-none sm:text-sm/6">book-chamber.com/profile/</div>
-                            <input
-                                id="username"
-                                name="username"
-                                type="text"
-                                autoComplete="username"
-                                placeholder={(state.payload?.get("username") || userData.username)}
-                                defaultValue={(state.payload?.get("username") || userData.username)}
-                                className="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-violet-950 dark:text-violet-100 placeholder:text-gray-400 dark:placeholder:text-violet-100/50 focus:outline-none sm:text-sm/6"
-                            />
-                        </div>
+                        <input
+                            id="username"
+                            name="username"
+                            type="text"
+                            autoComplete="username"
+                            placeholder={(state.payload?.get("username") || userData.username)}
+                            defaultValue={(state.payload?.get("username") || userData.username)}
+                            className="block w-full rounded-md bg-slate-100 dark:bg-slate-500 px-3 py-1.5 text-base text-violet-950 dark:text-violet-100 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 dark:placeholder:text-violet-100/50 focus:outline-2 focus:-outline-offset-2 focus:outline-violet-600 dark:focus:outline-violet-400 sm:text-sm/6"
+                        />
                     </div>
                 </div>
 
@@ -81,7 +78,7 @@ export default function EditProfileForm({ action, userData }) {
                             className="block w-full rounded-md bg-slate-100 dark:bg-slate-500 px-3 py-1.5 text-base text-violet-950 dark:text-violet-100 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 dark:placeholder:text-violet-100/50 focus:outline-2 focus:-outline-offset-2 focus:outline-violet-600 sm:text-sm/6"
                         />
                     </div>
-                    <p className="text-end text-gray-600 text-sm/6">{bio.length}/120 characters used</p>
+                    <p className="text-end text-gray-600 dark:text-gray-400/80 text-sm/6">{bio.length}/120 characters used</p>
                 </div>
 
                 <div className="col-span-full">

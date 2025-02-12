@@ -7,26 +7,23 @@ import connectDB from "@/lib/db";
 import Link from "next/link";
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
 import { FaFacebookSquare, FaGithubSquare, FaInstagramSquare, FaLinkedin } from "react-icons/fa";
+import SocialLinks from "@/components/social-links";
+import BookChamber from "@/components/book-chamber";
 
 export default async function ProfilePage({ params }) {
     const { username } = await params;
     await connectDB();
-    const profileData = await User.findOne({ username });
 
-    if (!profileData) {
-        notFound();
-    }
+    const [profileData, session] = await Promise.all([
+        User.findOne({ username }),
+        getSession()
+    ]);
 
-    const session = await getSession();
-    const user = session?.user;
-    let isUserProfile = false;
+    if (!profileData) notFound();
 
-    if (user) {
-        const userData = await User.findOne({ email: user.email });
-        if (userData.username === username) {
-            isUserProfile = true;
-        }
-    }
+    const isUserProfile = session?.user
+        ? (await User.findOne({email: session.user.email }))?.username === username
+        : false;
 
     return (
         <div className="mt-7 mx-auto max-w-lg grid grid-cols-1 lg:grid-cols-3 lg:max-w-5xl gap-7">
@@ -42,9 +39,9 @@ export default async function ProfilePage({ params }) {
                 <div className="flex flex-wrap justify-between">
                     <div>
                         <h1 className="font-bold text-violet-950 dark:text-violet-100 text-4xl">{profileData.firstName} {profileData.lastName}</h1>
-                        <p className="font-semibold text-violet-800 dark:text-violet-100 text-lg">{profileData.username}</p>
+                        <p className="font-semibold text-violet-800 dark:text-violet-300 text-lg">{profileData.username}</p>
                     </div>
-                    {isUserProfile ?
+                    {isUserProfile &&
                         <div className="self-center rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 hover:shadow-xs">
                             <Link
                                 href={`/profile/${username}/edit`}
@@ -53,57 +50,15 @@ export default async function ProfilePage({ params }) {
                                 <span className="sr-only">Edit Profile</span>
                                 <PencilSquareIcon className="size-8" />
                             </Link>
-                        </div> :
-                        <></>
+                        </div>
                     }
                 </div>
                 <p className="text-violet-950 dark:text-violet-100 mt-2 whitespace-pre-line">{profileData.bio}</p>
-                <div className="mt-2 flex flex-wrap items-center">
-                    {profileData.socials.facebook &&
-                        <div className="text-blue-600 hover:text-blue-500">
-                            <a
-                                href={profileData.socials.facebook}
-                                target="_blank"
-                                className="block p-2"
-                            >
-                                <FaFacebookSquare className="size-6" />
-                            </a>
-                        </div>
-                    }
-                    {profileData.socials.linkedin &&
-                        <div className="text-sky-600 hover:text-sky-500">
-                            <a
-                                href={profileData.socials.linkedin}
-                                target="_blank"
-                                className="block p-2"
-                            >
-                                <FaLinkedin className="size-6" />
-                            </a>
-                        </div>
-                    }
-                    {profileData.socials.instagram &&
-                        <div className="text-fuchsia-600 hover:text-fuchsia-500">
-                            <a
-                                href={profileData.socials.instagram}
-                                target="_blank"
-                                className="block p-2"
-                            >
-                                <FaInstagramSquare className="size-6" />
-                            </a>
-                        </div>
-                    }
-                    {profileData.socials.github &&
-                        <div className="text-slate-800 hover:text-slate-600">
-                            <a
-                                href={profileData.socials.github}
-                                target="_blank"
-                                className="block p-2"
-                            >
-                                <FaGithubSquare className="size-6" />
-                            </a>
-                        </div>
-                    }
-                </div>
+                <SocialLinks profileData={JSON.parse(JSON.stringify(profileData))} />
+            </div>
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-md shadow-md col-span-full mb-10">
+                <h1 className="font-semibold text-violet-950 dark:text-violet-100 text-center text-3xl">{profileData.firstName}'s Book Chamber</h1>
+                <BookChamber userData={JSON.parse(JSON.stringify(profileData))} />
             </div>
         </div>
     );

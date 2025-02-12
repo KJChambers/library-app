@@ -10,26 +10,22 @@ import { notFound, redirect } from "next/navigation";
 export default async function EditProfilePage({ params }) {
     const { username } = await params;
     await connectDB();
-    const profileData = await User.findOne({ username });
 
-    if (!profileData) {
-        notFound();
-    }
+    const [profileData, session] = await Promise.all([
+        User.findOne({ username }),
+        getSession()
+    ]);
 
-    const session = await getSession();
+    if (!profileData) notFound();
+
     const user = session?.user;
-    
-    if (!user) {
-        redirect('/login');
-    }
+    if (!user) redirect('/login');
 
     const userData = await User.findOne({ email: user.email });
-    if (userData.username !== username) {
-        redirect(`/profile/${username}`);
-    }
+    if (userData?.username !== username) redirect(`/profile/${username}`);
 
     return (
-        <div className="p-4 my-7 mx-auto w-full lg:w-5xl rounded-md shadow-xs bg-white dark:bg-slate-900">
+        <div className="p-6 my-7 mx-auto w-full lg:w-5xl rounded-md shadow-xs bg-white dark:bg-slate-900">
             <Link
                 href={`/profile/${username}`}
                 className="block mb-10 text-center sm:text-left sm:mb-0 sm:absolute font-semibold px-3 py-2 rounded-md bg-violet-500 hover:bg-violet-600 text-violet-100"

@@ -1,4 +1,4 @@
-import GoogleSignIn from "@/action/google";
+import { GoogleSignIn } from "@/action/oauth";
 import { FcGoogle } from "react-icons/fc";
 
 export default function GoogleButton() {

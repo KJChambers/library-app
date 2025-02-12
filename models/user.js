@@ -14,6 +14,7 @@ const userSchema = new mongoose.Schema({
         instagram: { type: String, default: "" },
         github: { type: String, default: "" }
     },
+    saved_books: [ String ],
     authProviderId: String,
 });
 

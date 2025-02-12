@@ -12,33 +12,19 @@ import connectDB from "@/lib/db";
 export default async function Header() {
     const session = await getSession();
     const user = session?.user;
+
 	let userData = null;
 	if (user) {
 		await connectDB();
 		userData = await User.findOne({ email: user.email });
 	}
 
-	let pages = [];
-
-	if (user) {
-		pages = [
-			{
-				href:'/dashboard',
-				name: 'Dashboard'
-			}
-		]
-	} else {
-		pages = [
-			{
-				href:'/login',
-				name:'Login'
-			},
-			{
-				href:'/register',
-				name:'Register'
-			}
-		]
-	}
+	const pages = user
+		? [{ href: '/dashboard', name: 'Dashboard'}]
+		: [
+			{ href: '/login', name: 'Login' },
+			{ href: '/register', name: 'Register' }
+		];
 
     return (
         <header className="p-6 bg-white dark:bg-slate-900">
