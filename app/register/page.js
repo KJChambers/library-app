@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { BookmarkIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { register } from "@/action/user";
-import RegisterForm from "@/components/forms/register-form";
+import RegisterForm from "@/components/forms/register/register-form";
 import GoogleButton from "@/components/google";
 
 export default async function RegisterPage() {
