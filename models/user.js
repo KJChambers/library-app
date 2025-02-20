@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
     username: { type: String, required: true },
     email: { type: String, required: true },
     password: { type: String, select: false },
-    imageUrl: { type: String, default: "" },
+    imageUrl: { type: String, default: "https://kdfty63zg3p3ls2v.public.blob.vercel-storage.com/avatar.jpg" },
     bio: { type: String, default: "" },
     socials: {
         facebook: { type: String, default: "" },
