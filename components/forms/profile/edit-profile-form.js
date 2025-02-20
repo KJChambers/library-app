@@ -1,14 +1,59 @@
 'use client';
 
-import { useActionState, useState } from "react";
+import { startTransition, useActionState, useState } from "react";
 import EditProfileFormSubmit from "./edit-profile-form-submit";
+import Cropper from "react-easy-crop";
+import getCroppedImg from "@/lib/crop-image";
+import Image from "next/image";
 
 export default function EditProfileForm({ action, userData }) {
     const [state, formAction] = useActionState(action, {});
     const [bio, setBio] = useState(userData.bio);
+    const [image, setImage] = useState(null);
+    const [crop, setCrop] = useState({ x: 0, y: 0 });
+    const [zoom, setZoom] = useState(1);
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+    const [croppedImage, setCroppedImage] = useState(null);
+    const [isCropping, setIsCropping] = useState(false);
+
+    const onCropComplete = (croppedArea, croppedAreaPixels) => {
+        setCroppedAreaPixels(croppedAreaPixels);
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = () => setImage(reader.result);
+            reader.readAsDataURL(file);
+            setIsCropping(true);
+        }
+    };
+
+    const handleCropSave = async () => {
+        const croppedImg = await getCroppedImg(image, croppedAreaPixels, 300, 300);
+        setCroppedImage(croppedImg);
+        setIsCropping(false);
+    }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        
+        if (croppedImage) {
+            const response = await fetch(croppedImage);
+            const blob = await response.blob();
+            const file = new File([blob], "cropped-image.jpg", { type: blob.type });
+            formData.append("profileImage", file);
+        } else formData.append("profileImage", userData.imageUrl);
+
+        startTransition(() => {
+            formAction(formData);
+        });
+    };
 
     return (
-        <form action={formAction} className="space-y-12 px-0 sm:px-44 pb-12 border-b border-gray-900/20 dark:border-gray-400/50">
+        <form onSubmit={handleSubmit} className="space-y-12 px-0 sm:px-44 pb-12 border-b border-gray-900/20 dark:border-gray-400/50">
             <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                 <input type="hidden" id="email" name="email" defaultValue={userData.email} />
                 <div className="sm:col-span-3">
@@ -80,6 +125,36 @@ export default function EditProfileForm({ action, userData }) {
                     </div>
                     <p className="text-end text-gray-600 dark:text-gray-400/80 text-sm/6">{bio.length}/120 characters used</p>
                 </div>
+
+                <div className="col-span-full">
+                    <label className="block text-sm font-medium text-violet-950 dark:text-violet-100">Profile Image</label>
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="mt-2 px-3 py-1.5 text-base block w-full rounded-md bg-slate-100 dark:bg-slate-500 text-violet-950 dark:text-violet-100 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6 file:mr-4 file:rounded-md file:border-0 file:bg-violet-500 file:text-violet-100 file:px-4 file:py-1.5 file:font-semibold cursor-pointer hover:file:bg-violet-700"
+                    />
+                    <Image src={croppedImage || userData.imageUrl} alt="Profile Image" width={300} height={300} className="mt-6 w-32 h-32 rounded-full" />
+                </div>
+
+                {isCropping && (
+                    <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+                        <div className="bg-white p-4 rounded-lg">
+                            <div className="relative p-60">
+                                <Cropper 
+                                    image={image}
+                                    crop={crop}
+                                    zoom={zoom}
+                                    aspect={1}
+                                    onCropChange={setCrop}
+                                    onZoomChange={setZoom}
+                                    onCropComplete={onCropComplete}
+                                />
+                            </div>
+                            <button onClick={handleCropSave} className="mt-4 bg-violet-600 text-white px-4 py-2 rounded">Save</button>
+                        </div>
+                    </div>
+                )}
 
                 <div className="col-span-full">
                 {state.errors && (

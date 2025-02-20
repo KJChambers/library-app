@@ -1,6 +1,4 @@
-import connectDB from "@/lib/db";
 import { getSession } from "@/lib/get-session";
-import { User } from "@/models/user";
 import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {

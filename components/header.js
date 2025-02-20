@@ -2,7 +2,6 @@ import { DropdownNavLink, NavLink } from "./nav-link";
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon, BookmarkIcon } from '@heroicons/react/24/outline';
 import { getSession } from "@/lib/get-session";
-import pfp from '@/public/obi-wan.jpg';
 import Link from "next/link";
 import Image from "next/image";
 import { signOut } from "@/lib/auth";
@@ -62,8 +61,11 @@ export default async function Header() {
 											<span className="sr-only">Open user menu</span>
 											<Image 
 												alt="Profile picture"
-												src={pfp}
+												src={userData.imageUrl}
 												className="size-11 rounded-full"
+												height={300}
+												width={300}
+												priority
 											/>
 										</MenuButton>
 									</div>

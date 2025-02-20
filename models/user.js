@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
     username: { type: String, required: true },
     email: { type: String, required: true },
     password: { type: String, select: false },
-    imageUrl: String,
+    imageUrl: { type: String, default: "" },
     bio: { type: String, default: "" },
     socials: {
         facebook: { type: String, default: "" },
@@ -14,7 +14,12 @@ const userSchema = new mongoose.Schema({
         instagram: { type: String, default: "" },
         github: { type: String, default: "" }
     },
-    saved_books: [ String ],
+    saved_books: [{
+        bookId: String,
+        read: Boolean,
+        date_started: String,
+        date_completed: String
+    }],
     authProviderId: String,
 });
 

@@ -1,5 +1,6 @@
 import Header from "@/components/header";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/react"
 
 export const metadata = {
   title: "Book Chamber",
@@ -12,6 +13,7 @@ export default function RootLayout({ children }) {
       <body className="bg-slate-100 dark:bg-slate-800">
         <Header />
         {children}
+        <Analytics />
       </body>
     </html>
   );

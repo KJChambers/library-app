@@ -1,14 +1,14 @@
 import { getSession } from "@/lib/get-session";
 import { User } from "@/models/user";
 import { notFound } from "next/navigation";
-import pfp from "@/public/obi-wan.jpg";
+import pfp from "@/public/obi-wan.jpg"
 import Image from "next/image";
 import connectDB from "@/lib/db";
 import Link from "next/link";
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
-import { FaFacebookSquare, FaGithubSquare, FaInstagramSquare, FaLinkedin } from "react-icons/fa";
 import SocialLinks from "@/components/social-links";
-import BookChamber from "@/components/book-chamber";
+import BookChamber from "@/components/book/book-chamber";
+import AddBookButton from "@/components/book/add-book-button";
 
 export default async function ProfilePage({ params }) {
     const { username } = await params;
@@ -29,10 +29,12 @@ export default async function ProfilePage({ params }) {
         <div className="mt-7 mx-auto max-w-lg grid grid-cols-1 lg:grid-cols-3 lg:max-w-5xl gap-7">
             <div className="bg-white dark:bg-slate-900 p-6 rounded-md shadow-md space-y-5">
                 <Image 
-                    src={pfp}
+                    src={profileData.imageUrl}
                     alt="Profile picture"
                     className="rounded-full outline-5 outline-violet-800 size-44 mx-auto"
-                    priority={true}
+                    width={300}
+                    height={300}
+                    priority
                 />
             </div>
             <div className="bg-white dark:bg-slate-900 p-6 rounded-md shadow-md lg:col-span-2">
@@ -57,7 +59,20 @@ export default async function ProfilePage({ params }) {
                 <SocialLinks profileData={JSON.parse(JSON.stringify(profileData))} />
             </div>
             <div className="bg-white dark:bg-slate-900 p-6 rounded-md shadow-md col-span-full mb-10">
-                <h1 className="font-semibold text-violet-950 dark:text-violet-100 text-center text-3xl">{profileData.firstName}'s Book Chamber</h1>
+                <div className="flex justify-center items-center relative">
+                    <h1 className="font-semibold text-violet-950 dark:text-violet-100 text-center text-3xl">{profileData.firstName}'s Book Chamber</h1>
+                    { isUserProfile &&
+                        <div className="absolute right-5 hidden lg:block">
+                            <span className="sr-only">Add a book to your profile</span>
+                            <AddBookButton />
+                        </div>
+                    }
+                </div>
+
+                <div className="flex lg:hidden mt-4 justify-center">
+                    <AddBookButton />
+                </div>
+
                 <BookChamber userData={JSON.parse(JSON.stringify(profileData))} />
             </div>
         </div>

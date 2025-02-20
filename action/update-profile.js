@@ -4,10 +4,11 @@ import connectDB from "@/lib/db";
 import { User } from "@/models/user";
 import { redirect } from "next/navigation";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
+import { del, put } from "@vercel/blob";
 
 async function updateUserProfile(prevState, formData) {
     const requiredFields= ["firstName", "lastName", "username"];
-    const userData = Object.fromEntries(requiredFields.map(field => [field, formData.get(field)]));
+    const userData = Object.fromEntries(requiredFields.map(field => [field, formData.get(field).trim()]));
     userData.bio = formData.get("bio") || "";
     userData.email = formData.get("email");
 
@@ -19,6 +20,11 @@ async function updateUserProfile(prevState, formData) {
 
     if (userData.username.length < 4 || userData.username.length > 16) {
         errors.push("Username must be 4-16 characters.");
+    }
+
+    const namePattern = /^[a-zA-Z]+$/;
+    if (!namePattern.test(userData.firstName) || !namePattern.test(userData.lastName)) {
+        errors.push("Your first and last name cannot contain spaces.");
     }
 
     const usernamePattern = /^[a-z0-9._]+$/;
@@ -41,7 +47,14 @@ async function updateUserProfile(prevState, formData) {
     await connectDB();
     const user = await User.findOne({ email: userData.email });
 
-    if (requiredFields.every(field => user[field] === userData[field]) && user.bio === userData.bio) {
+    const imageUrl = formData.get("profileImage");
+    if (imageUrl !== user.imageUrl) {
+        await del(user.imageUrl);
+        const blob = await put(`profile.jpg`, imageUrl, { access: 'public' });
+        userData.imageUrl = blob.url;
+    } else userData.imageUrl = user.imageUrl;
+
+    if (requiredFields.every(field => user[field] === userData[field]) && user.bio === userData.bio && user.imageUrl === userData.imageUrl) {
         return { payload: formData };
     }
 
@@ -59,7 +72,7 @@ async function updateUserProfile(prevState, formData) {
     try {
         let updated = false;
 
-        requiredFields.concat("bio").forEach(field => {
+        requiredFields.concat(["bio", "imageUrl"]).forEach(field => {
             if (user[field] !== userData[field]) {
                 user[field] = userData[field];
                 updated = true;
