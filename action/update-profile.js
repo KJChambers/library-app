@@ -49,7 +49,7 @@ async function updateUserProfile(prevState, formData) {
 
     const imageUrl = formData.get("profileImage");
     if (imageUrl !== user.imageUrl) {
-        await del(user.imageUrl);
+        if (user.imageUrl !== "https://kdfty63zg3p3ls2v.public.blob.vercel-storage.com/avatar.jpg") await del(user.imageUrl);
         const blob = await put(`profile.jpg`, imageUrl, { access: 'public' });
         userData.imageUrl = blob.url;
     } else userData.imageUrl = user.imageUrl;
