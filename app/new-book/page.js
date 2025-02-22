@@ -20,7 +20,7 @@ export default async function NewBookPage() {
                 <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-violet-950 dark:text-violet-100">
                     Create a Book
                 </h2>
-                <p className="mt-5 text-center text-lg/9 tracking-tight text-gray-500 dark:text-gray-100">ISBN is used to fetch cover images!</p>
+                <p className="mt-5 text-center text-lg/9 tracking-tight text-gray-500 dark:text-gray-100">You can use the ISBN to fetch most data!</p>
                 <p className="text-center text-sm/9 tracking-tight text-gray-500 dark:text-gray-100">All submissions will be moderated</p>
             </div>
 

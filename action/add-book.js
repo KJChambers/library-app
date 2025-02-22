@@ -18,7 +18,15 @@ export async function HandleISBN(ISBN) {
     await connectDB();
     const existingBook = await Book.findOne({ ISBN });
     if (existingBook) return { isbnExists: true, ISBN };
-    return { isbnExists: false, ISBN: null };
+    const res = await fetch(`https://openlibrary.org/isbn/${ISBN}.json`);
+    let bookData = null;
+    if (res.status === 200) bookData = await res.json();
+    return { isbnExists: false, ISBN: null, bookData };
+}
+
+export async function fetchAuthorFromKey(key) {
+    const res = await fetch(`https://openlibrary.org/${key}.json`);
+    return await res.json();
 }
 
 export async function AddBook(prevState, formData) {

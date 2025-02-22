@@ -5,24 +5,50 @@ import CategorySelect from "./category-select";
 import NewBookSubmitButton from "./new-book-submit";
 import DateSelect from "./date-select";
 import Link from "next/link";
-import { HandleISBN, HandleTitle } from "@/action/add-book";
+import { fetchAuthorFromKey, HandleISBN } from "@/action/add-book";
 
 export default function NewBookForm({ action, userData }) {
     const [state, formAction] = useActionState(action, {});
     const [desc, setDesc] = useState("");
     const [isbnExists, setIsbnExists] = useState(false);
     const [ISBN, setISBN] = useState(null);
+    const [bookData, setBookData] = useState({});
+    const [authorPrev, setAuthorPrev] = useState("");
+    const [title, setTitle] = useState("");
+    const [publisher, setPublisher] = useState("");
+    const [author, setAuthor] = useState("")
+    const [pages, setPages] = useState(null);
+    const [open, setOpen] = useState(false);
 
     const handleIsbnChange = async (ISBN) => {
-        const res = await HandleISBN(ISBN);
+        if (ISBN.length < 13) return;
+
+        const res = await HandleISBN(ISBN.replaceAll("-", ''));
         setIsbnExists(res.isbnExists);
         setISBN(res.ISBN);
+        
+        const bookData = res.bookData;
+        if (!bookData) {
+            return;
+        }
+        setBookData(bookData);
+        const authorData = await fetchAuthorFromKey(bookData.authors[0].key);
+        setAuthorPrev(authorData.name || authorData.personal_name);
+        setOpen(true);
     };
+
+    const autofillData = () => {
+        setTitle(bookData.title);
+        setAuthor(authorPrev);
+        setPublisher(bookData.publishers[0]);
+        setPages(bookData.number_of_pages);
+        setOpen(false);
+    }
 
     return (
         <form action={formAction} className="space-y-6">
 
-            <div>
+            <div className="relative">
                 <label htmlFor="isbn" className="text-sm/6 font-medium text-violet-950 dark:text-violet-100 after:ml-0.5 after:text-red-500 after:content-['*'] flex items-center gap-2">
                     ISBN
                     <div className="relative group">
@@ -50,6 +76,17 @@ export default function NewBookForm({ action, userData }) {
                         <Link className="text-violet-700 dark:text-violet-100 hover:text-violet-500 dark:hover:text-violet-300" href={`/books/${ISBN}`}>Go to book page!</Link>
                     </div>
                 )}
+                {open && (
+                    <div className="absolute z-10 w-full bg-white dark:bg-slate-600 border border-gray-200 rounded-md shadow-md mt-1">
+                        <div
+                            className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 cursor-pointer"
+                            onClick={() => autofillData()}
+                        >
+                            <p className="font-semibold">{bookData.title}</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-300/80">{authorPrev}</p>
+                        </div>
+                    </div>
+                )}
             </div>
 
             <div className="relative">
@@ -63,7 +100,8 @@ export default function NewBookForm({ action, userData }) {
                         type="text"
                         autoComplete="off"
                         placeholder="Star Wars: Episode I - The Phantom Menace"
-                        defaultValue={(state.payload?.get("title") || "")}
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
                         className="block w-full rounded-md bg-white dark:bg-slate-500 px-3 py-1.5 text-base text-violet-950 dark:text-violet-100 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 dark:placeholder:text-violet-100/50 focus:outline-2 focus:-outline-offset-2 focus:outline-violet-600 dark:focus:outline-violet-400 sm:text-sm/6"
                     />
                 </div>
@@ -100,7 +138,8 @@ export default function NewBookForm({ action, userData }) {
                         type="text"
                         autoComplete="on"
                         placeholder="Terry Brooks"
-                        defaultValue={(state.payload?.get("authors") || "")}
+                        value={author}
+                        onChange={e => setAuthor(e.target.value)}
                         className="block w-full rounded-md bg-white dark:bg-slate-500 px-3 py-1.5 text-base text-violet-950 dark:text-violet-100 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 dark:placeholder:text-violet-100/50 focus:outline-2 focus:-outline-offset-2 focus:outline-violet-600 dark:focus:outline-violet-400 sm:text-sm/6"
                     />
                 </div>
@@ -118,7 +157,8 @@ export default function NewBookForm({ action, userData }) {
                         autoComplete="off"
                         placeholder="324"
                         min={0}
-                        defaultValue={(state.payload?.get("pages") || "")}
+                        value={pages || ""}
+                        onChange={e => setPages(e.target.value)}
                         className="block w-full rounded-md bg-white dark:bg-slate-500 px-3 py-1.5 text-base text-violet-950 dark:text-violet-100 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 dark:placeholder:text-violet-100/50 focus:outline-2 focus:-outline-offset-2 focus:outline-violet-600 dark:focus:outline-violet-400 sm:text-sm/6"
                     />
                 </div>
@@ -135,7 +175,8 @@ export default function NewBookForm({ action, userData }) {
                         type="text"
                         autoComplete="on"
                         placeholder="Arrow Books"
-                        defaultValue={(state.payload?.get("publisher") || "")}
+                        value={publisher}
+                        onChange={e => setPublisher(e.target.value)}
                         className="block w-full rounded-md bg-white dark:bg-slate-500 px-3 py-1.5 text-base text-violet-950 dark:text-violet-100 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 dark:placeholder:text-violet-100/50 focus:outline-2 focus:-outline-offset-2 focus:outline-violet-600 dark:focus:outline-violet-400 sm:text-sm/6"
                     />
                 </div>
