@@ -5,6 +5,7 @@ import Link from "next/link";
 import register from "@/action/register";
 import RegisterForm from "@/components/forms/register/register-form";
 import GoogleButton from "@/components/google";
+import { User } from "@/models/user";
 
 export default async function RegisterPage() {
     const session = await getSession();
