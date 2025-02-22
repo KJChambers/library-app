@@ -14,6 +14,13 @@ export async function AddBookRedirect() {
     redirect('/new-book');
 }
 
+export async function HandleISBN(ISBN) {
+    await connectDB();
+    const existingBook = await Book.findOne({ ISBN });
+    if (existingBook) return { isbnExists: true, ISBN };
+    return { isbnExists: false, ISBN: null };
+}
+
 export async function AddBook(prevState, formData) {
     const title = formData.get("title")?.trim(); // required
     const authors = formData.get("authors")?.trim() || "Unknown";

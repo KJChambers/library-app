@@ -19,7 +19,8 @@ export default function AddBookButton() {
                 <div className="fixed inset-0 flex w-screen items-center justify-center p-4 bg-black/35">
                     <DialogPanel className="max-w-lg space-y-4 text-center rounded-lg shadow-sm bg-white dark:bg-slate-600 text-violet-950 dark:text-violet-100 p-8">
                         <DialogTitle className="font-bold text-lg">Add a New Book</DialogTitle>
-                        <Description>Choose how you would like to add a book</Description>
+                        <p>We suggest searching our Book Archives for existing books first, then you can add a book manually if we don't have it!</p>
+                        <p className="mt-2 font-bold">Choose how you would like to add a book</p>
                         <div className="flex justify-center gap-4">
                             <form action={SearchRedirect}>
                                 <button 

@@ -40,7 +40,7 @@ export default function CategorySelector() {
                         {categories.sort().map((category) => (
                             <button
                                 key={category}
-                                onClick={() => router.push(`/books/search?category=${category.replace(' ', '-')}`)}
+                                onClick={() => router.push(`/books/search?category=${category.replaceAll(' ', '-').replace('&', '%26')}`)}
                                 className="p-2 cursor-pointer bg-violet-500 text-white rounded-md hover:bg-violet-700"
                             >
                                 {category}

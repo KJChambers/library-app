@@ -5,11 +5,15 @@ import { redirect } from "next/navigation";
 import { BookmarkIcon } from "@heroicons/react/24/outline";
 import LoginForm from "@/components/forms/login/login-form";
 import GoogleButton from "@/components/google";
+import { User } from "@/models/user";
 
 export default async function LoginPage() {
     const session = await getSession();
     const user = session?.user;
-    if (user) redirect("/dashboard");
+    if (user) {
+        const data = await User.findOne({ email: user.email });
+        redirect(`/profile/${data.username}`);
+    }
 
     return (
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">

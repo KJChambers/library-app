@@ -19,8 +19,9 @@ export default async function Header() {
 	}
 
 	const pages = user
-		? [{ href: '/dashboard', name: 'Dashboard'}]
+		? [{ href: '/books', name: 'Archives'}]
 		: [
+			{ href: '/books', name: 'Archives'},
 			{ href: '/login', name: 'Login' },
 			{ href: '/register', name: 'Register' }
 		];

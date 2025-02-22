@@ -72,6 +72,6 @@ export default async function login(prevState, formData) {
             payload: formData
         };
     } else {
-        redirect("/dashboard");
+        redirect(`/profile/${user.username}`);
     }
 }

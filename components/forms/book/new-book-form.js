@@ -4,15 +4,55 @@ import { useActionState, useState } from "react";
 import CategorySelect from "./category-select";
 import NewBookSubmitButton from "./new-book-submit";
 import DateSelect from "./date-select";
+import Link from "next/link";
+import { HandleISBN, HandleTitle } from "@/action/add-book";
 
 export default function NewBookForm({ action, userData }) {
     const [state, formAction] = useActionState(action, {});
     const [desc, setDesc] = useState("");
+    const [isbnExists, setIsbnExists] = useState(false);
+    const [ISBN, setISBN] = useState(null);
+
+    const handleIsbnChange = async (ISBN) => {
+        const res = await HandleISBN(ISBN);
+        setIsbnExists(res.isbnExists);
+        setISBN(res.ISBN);
+    };
 
     return (
         <form action={formAction} className="space-y-6">
 
             <div>
+                <label htmlFor="isbn" className="text-sm/6 font-medium text-violet-950 dark:text-violet-100 after:ml-0.5 after:text-red-500 after:content-['*'] flex items-center gap-2">
+                    ISBN
+                    <div className="relative group">
+                        <span className="cursor-help text-violet-600 dark:text-violet-400 text-sm font-bold">?</span>
+                        <div className="absolute left-1/2 -translate-x-1/2 mt-1 hidden w-40 rounded-md bg-gray-800 text-white text-xs px-2 py-1 shadow-md group-hover:block">
+                            Usually found on the back cover. Can be found on Goodreads or OpenLibrary.
+                        </div>
+                    </div>
+                </label>
+                <div className="mt-2">
+                    <input
+                        id="isbn"
+                        name="isbn"
+                        type="text"
+                        autoComplete="off"
+                        placeholder="9780099409960"
+                        defaultValue={(state.payload?.get("isbn") || "")}
+                        onChange={e => handleIsbnChange(e.target.value)}
+                        className="block w-full rounded-md bg-white dark:bg-slate-500 px-3 py-1.5 text-base text-violet-950 dark:text-violet-100 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 dark:placeholder:text-violet-100/50 focus:outline-2 focus:-outline-offset-2 focus:outline-violet-600 dark:focus:outline-violet-400 sm:text-sm/6"
+                    />
+                </div>
+                {isbnExists && (
+                    <div className="text-red-500">
+                        <span>ISBN already exists in our archives - </span>
+                        <Link className="text-violet-700 dark:text-violet-100 hover:text-violet-500 dark:hover:text-violet-300" href={`/books/${ISBN}`}>Go to book page!</Link>
+                    </div>
+                )}
+            </div>
+
+            <div className="relative">
                 <label htmlFor="title" className="block text-sm/6 font-medium text-violet-950 dark:text-violet-100 after:ml-0.5 after:text-red-500 after:content-['*']">
                     Title
                 </label>
@@ -47,29 +87,6 @@ export default function NewBookForm({ action, userData }) {
                     />
                 </div>
                 <p className="text-end text-gray-600 dark:text-gray-400/80 text-sm/6">{desc.length}/1600 characters used</p>
-            </div>
-
-            <div>
-                <label htmlFor="isbn" className="text-sm/6 font-medium text-violet-950 dark:text-violet-100 after:ml-0.5 after:text-red-500 after:content-['*'] flex items-center gap-2">
-                    ISBN
-                    <div className="relative group">
-                        <span className="cursor-help text-violet-600 dark:text-violet-400 text-sm font-bold">?</span>
-                        <div className="absolute left-1/2 -translate-x-1/2 mt-1 hidden w-40 rounded-md bg-gray-800 text-white text-xs px-2 py-1 shadow-md group-hover:block">
-                            Usually found on the back cover
-                        </div>
-                    </div>
-                </label>
-                <div className="mt-2">
-                    <input
-                        id="isbn"
-                        name="isbn"
-                        type="text"
-                        autoComplete="off"
-                        placeholder="9780099409960"
-                        defaultValue={(state.payload?.get("isbn") || "")}
-                        className="block w-full rounded-md bg-white dark:bg-slate-500 px-3 py-1.5 text-base text-violet-950 dark:text-violet-100 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 dark:placeholder:text-violet-100/50 focus:outline-2 focus:-outline-offset-2 focus:outline-violet-600 dark:focus:outline-violet-400 sm:text-sm/6"
-                    />
-                </div>
             </div>
 
             <div>

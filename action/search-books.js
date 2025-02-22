@@ -31,12 +31,16 @@ export default async function searchBooks(query, filters, amount = null) {
     ];
     
     for (const condition of searchConditions) {
-        if (books.length >= amount) break;
-
         const queryFilter = { ...condition, ...searchQuery };
+        let newBookQuery = Book.find(queryFilter);
 
-        const remaining = amount - books.length;
-        const newBooks = await Book.find(queryFilter).limit(remaining);
+        if (amount) {
+            if (books.length >= amount) break;
+            const remaining = amount - books.length;
+            newBookQuery.limit(remaining);
+        }
+
+        const newBooks = await newBookQuery;
 
         for (const book of newBooks) {
             if (!bookSet.has(book._id.toString())) {
