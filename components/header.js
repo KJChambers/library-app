@@ -71,12 +71,12 @@ export default async function Header() {
 									</div>
 									<MenuItems
 										transition
-										className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5 transition focus:outline-hidden data-closed:scale-95 data-closed:transform cata-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
+										className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-slate-500 py-1 ring-1 shadow-lg ring-black/5 transition focus:outline-hidden data-closed:scale-95 data-closed:transform cata-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
 									>
 										<MenuItem>
 											<Link 
 												href={"/profile/" + userData.username}
-												className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
+												className="block px-4 py-2 text-sm text-violet-950 dark:text-violet-100 data-focus:bg-gray-100 dark:data-focus:bg-slate-700 data-focus:outline-hidden"
 											>
 												Your Profile
 											</Link>
@@ -86,7 +86,7 @@ export default async function Header() {
 												"use server";
 												await signOut({ redirectTo: '/' });
 											}}>
-												<button type="submit" className="w-full block px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:outline-hidden cursor-pointer">
+												<button type="submit" className="w-full block px-4 py-2 text-left text-sm text-violet-950 dark:text-violet-100 hover:bg-gray-100 dark:hover:bg-slate-700 hover:outline-hidden cursor-pointer">
 													Sign out
 												</button>
 											</form>

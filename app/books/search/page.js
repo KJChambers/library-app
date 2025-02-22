@@ -7,11 +7,10 @@ export default async function SearchResultsPage({ searchParams }) {
     const params = await searchParams;
     const query = params.query?.replace('-', ' ') || "";
     const category = params.category?.replace('-', ' ') || "";
-    const amount = params.amount || 20;
 
     let books = [];
     if (query || category) {
-        books = JSON.parse(await searchBooks(query, { category }, amount));
+        books = JSON.parse(await searchBooks(query, { category }));
     }
 
     return (

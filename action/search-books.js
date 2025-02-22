@@ -3,7 +3,7 @@
 import connectDB from "@/lib/db";
 import { Book } from "@/models/book";
 
-export default async function searchBooks(query, filters, amount) {
+export default async function searchBooks(query, filters, amount = null) {
     await connectDB();
 
     const bookSet = new Set();
@@ -13,7 +13,11 @@ export default async function searchBooks(query, filters, amount) {
     if (filters.category) searchQuery.categories = filters.category;
 
     if (!query.trim()) {
-        books = await Book.find(searchQuery).limit(amount);
+        let query = Book.find(searchQuery);
+        if (amount) {
+            query = query.limit(amount);
+        }
+        const books = await query;
         return JSON.stringify(books);
     }
 

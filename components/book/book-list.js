@@ -1,11 +1,13 @@
 'use client';
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function BookList({ books, className }) {
     if (books.length === 0) return <p className="col-span-full text-center text-violet-950 dark:text-violet-100">No books to show!</p>;
 
+    const router = useRouter();
     const [visibleCount, setVisibleCount] = useState(8);
 
     const showMoreBooks = () => {
@@ -15,7 +17,11 @@ export default function BookList({ books, className }) {
     return (
         <div className={`mt-10 ${className} text-center md:text-left text-violet-950 dark:text-violet-100`}>
             {books.slice(0, visibleCount).map((book) => (
-                    <div key={book._id} className="p-4 bg-white dark:bg-slate-600 border border-gray-300 dark:border-slate-300/60 rounded-md shadow-sm">
+                    <div
+                        key={book._id}
+                        className="p-4 bg-white dark:bg-slate-600 border border-gray-300 dark:border-slate-300/60 rounded-md shadow-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-700"
+                        onClick={() => router.push(`/books/${book.ISBN}`)}
+                    >
                         <div className="relative mx-auto w-44 aspect-5/8 md:w-full h-auto overflow-hidden">
                             <Image
                                 src={`https://covers.openlibrary.org/b/isbn/${book.ISBN}-M.jpg`}
