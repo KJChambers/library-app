@@ -53,10 +53,10 @@ export async function AddBook(prevState, formData) {
 
     await connectDB();
     const cleanedISBN = ISBN.replace(/-/g, '');
-    const existingBook = await Book.findOne({ cleanedISBN });
+    const existingBook = await Book.findOne({ ISBN: cleanedISBN });
     if (existingBook) {
         errors.add("ISBN already exists");
-        return { errors: Array.from(errors), payload: formData }
+        return { errors: Array.from(errors), payload: formData };
     }
 
     let parsedCategories;
