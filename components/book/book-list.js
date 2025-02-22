@@ -15,7 +15,7 @@ export default function BookList({ books, className }) {
     return (
         <div className={`mt-10 ${className} text-center md:text-left text-violet-950 dark:text-violet-100`}>
             {books.slice(0, visibleCount).map((book) => (
-                    <div key={book._id} className="p-4 bg-white border border-gray-300 rounded-md shadow-sm">
+                    <div key={book._id} className="p-4 bg-white dark:bg-slate-600 border border-gray-300 dark:border-slate-300/60 rounded-md shadow-sm">
                         <div className="relative mx-auto w-44 aspect-5/8 md:w-full h-auto overflow-hidden">
                             <Image
                                 src={`https://covers.openlibrary.org/b/isbn/${book.ISBN}-M.jpg`}

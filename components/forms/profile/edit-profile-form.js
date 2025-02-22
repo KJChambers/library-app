@@ -132,7 +132,7 @@ export default function EditProfileForm({ action, userData }) {
                         type="file"
                         accept="image/*"
                         onChange={handleImageChange}
-                        className="mt-2 px-3 py-1.5 text-base block w-full rounded-md bg-slate-100 dark:bg-slate-500 text-violet-950 dark:text-violet-100 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6 file:mr-4 file:rounded-md file:border-0 file:bg-violet-500 file:text-violet-100 file:px-4 file:py-1.5 file:font-semibold cursor-pointer hover:file:bg-violet-700"
+                        className="mt-2 px-3 py-1.5 text-base block w-full rounded-md bg-slate-100 dark:bg-slate-500 text-violet-950 dark:text-violet-100 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6 file:mr-4 file:rounded-md file:border-0 file:bg-violet-500 dark:file:bg-violet-700 file:text-violet-100 file:px-4 file:py-1.5 file:font-semibold cursor-pointer hover:file:bg-violet-700 dark:hover:file:bg-violet-600"
                     />
                     <Image src={croppedImage || userData.imageUrl} alt="Profile Image" width={300} height={300} className="mt-6 w-32 h-32 rounded-full" />
                 </div>

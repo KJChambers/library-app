@@ -7,7 +7,7 @@ export default function BooksPage() {
             <h1 className="text-center font-bold text-4xl pb-5">Book Archives</h1>
             <p className="text-center font-semibold">Search for a book</p>
 
-            <SearchBar />
+            <SearchBar className="mt-4" />
             
             <div className="flex items-center justify-center my-5">
                 <div className="w-1/3 border-t border-gray-400"></div>
