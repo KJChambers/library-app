@@ -79,7 +79,7 @@ export default function EditBookForm({ action, book }) {
 
             <div className="relative">
                 <label htmlFor="isbn" className="text-sm/6 font-medium text-violet-950 dark:text-violet-100 after:ml-0.5 after:text-red-500 after:content-['*'] flex items-center gap-2">
-                    ISBN
+                    ISBN 13
                     <div className="relative group">
                         <span className="cursor-help text-violet-600 dark:text-violet-400 text-sm font-bold">?</span>
                         <div className="absolute left-1/2 -translate-x-1/2 mt-1 hidden w-40 rounded-md bg-gray-800 text-white text-xs px-2 py-1 shadow-md group-hover:block">
