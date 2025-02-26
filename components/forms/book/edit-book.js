@@ -9,6 +9,7 @@ import Link from "next/link";
 export default function EditBookForm({ action, book }) {
     const [state, formAction] = useActionState(action, {});
     const [isbnExists, setIsbnExists] = useState(false);
+    const [isbnTen, setIsbnTen] = useState(false);
     const [bookPrev, setBookPrev] = useState(null);
     const [authorPrev, setAuthorPrev] = useState(null);
     const [open, setOpen] = useState(false);
@@ -25,13 +26,18 @@ export default function EditBookForm({ action, book }) {
     const handleIsbnChange = async (inputISBN) => {
         setISBN(inputISBN);
 
-        if (inputISBN.length !== 13) {
+        if (inputISBN.trim().replaceAll('-', '').length !== 10) {
             setIsbnExists(false);
             return;
         };
 
         const res = await HandleISBN(inputISBN.replaceAll("-", ''));
-        console.log(res);
+
+        setIsbnTen(res.isbnTen);
+        if (res.isbnTen) {
+            setIsbnExists(false);
+            return;
+        };
         setIsbnExists(res.isbnExists);
                 
         const bookData = res.bookData;
@@ -97,6 +103,11 @@ export default function EditBookForm({ action, book }) {
                     <div className="text-red-500">
                         <span>ISBN already exists in our archives - </span>
                         <Link className="text-violet-700 dark:text-violet-100 hover:text-violet-500 dark:hover:text-violet-300" href={`/books/${ISBN}`}>Go to book page!</Link>
+                    </div>
+                )}
+                {isbnTen && (
+                    <div className="text-red-500">
+                        <span>Seems like you've input an ISBN 10. Please use ISBN 13.</span>
                     </div>
                 )}
                 {open && (

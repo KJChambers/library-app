@@ -4,14 +4,14 @@ import { AddExistingBookButton, NoUserButton, RemoveBookButton } from "@/compone
 import CategoryList from "@/components/book/category-list";
 import CoverImage from "@/components/book/cover-image";
 import EditBookForm from "@/components/forms/book/edit-book";
-import { fetchIsbnTen } from "@/lib/book";
+import { fetchIsbnTen, fetchWaterstones } from "@/lib/book";
 import connectDB from "@/lib/db";
 import { getSession } from "@/lib/get-session"
 import { Book } from "@/models/book";
 import { User } from "@/models/user";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { FaAmazon } from "react-icons/fa";
+import { FaAmazon, FaShoppingCart } from "react-icons/fa";
 
 export default async function BookInfoPage({ params }) {
     await connectDB();
@@ -46,7 +46,9 @@ export default async function BookInfoPage({ params }) {
     
         userHasBook = userData.saved_books.some(book => book.bookId === bookData._id.toString());
     }
+
     const isbnTen = await fetchIsbnTen(bookData.ISBN);
+    const waterstones = await fetchWaterstones(bookData.ISBN);
 
     const initDate = new Date(bookData.pub_date);
     const options = {
@@ -83,6 +85,17 @@ export default async function BookInfoPage({ params }) {
                                 >
                                     <FaAmazon className="w-6 h-6" />
                                     <span className="font-bold">Buy on Amazon</span>
+                                </a>
+                            )}
+                            {waterstones && (
+                                <a
+                                    href={`https://waterstones.com/book/${ISBN}`}
+                                    className="flex items-center justify-center gap-2 py-3 mb-2 w-full text-violet-950 dark:text-violet-100 bg-white dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-600 outline-2 outline-gray-300 cursor-pointer mx-auto rounded-md"
+                                    rel="noopener noreferrer"
+                                    target="_blank"
+                                >
+                                    <FaShoppingCart className="w-6 h-6" />
+                                    <span className="font-bold">Buy on Waterstones</span>
                                 </a>
                             )}
                         </div>

@@ -12,14 +12,14 @@
 - Deployment through Vercel
 - Forgot Password functionality
 - Profile Page
+- Update profile picture
 - Edit profile functionality
+- Library Functionality (finally done!)
 
 **Left to Do**
-- Update profile picture
 - Update email
-- Dashboard Page
 - Main Home Page
-- Library Functionality (a lot of stuff here!)
+- Quality of Life additions
 
 # Development Story
 

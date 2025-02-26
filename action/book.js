@@ -21,8 +21,12 @@ export async function HandleISBN(ISBN) {
     if (existingBook) return { isbnExists: true, ISBN };
     const res = await fetch(`https://openlibrary.org/isbn/${ISBN}.json`);
     let bookData = null;
-    if (res.status === 200) bookData = await res.json();
-    return { isbnExists: false, ISBN: null, bookData };
+    let isbnTen = false;
+    if (res.status === 200) {
+        bookData = await res.json();
+        if (bookData.isbn_10.includes(ISBN)) isbnTen = true;
+    };
+    return { isbnExists: false, ISBN: null, bookData, isbnTen };
 }
 
 export async function fetchAuthorFromKey(key) {
@@ -53,7 +57,7 @@ export async function AddBook(prevState, formData) {
         const cleanedISBN = ISBN.replace(/-/g, '');
 
         if (!/^\d+$/.test(cleanedISBN)) errors.add("ISBN must only contain numbers.");
-        if (cleanedISBN.length !== 10 && cleanedISBN.length !== 13) errors.add("ISBN must be 13 digits");
+        if (cleanedISBN.length !== 13) errors.add("ISBN must be 13 digits");
     }
 
     if (!title || !desc) errors.add("Title and description required.");
