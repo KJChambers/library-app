@@ -26,14 +26,16 @@ export default function EditBookForm({ action, book }) {
     const handleIsbnChange = async (inputISBN) => {
         setISBN(inputISBN);
 
-        if (inputISBN.trim().replaceAll('-', '').length !== 10) {
+        if (inputISBN.trim().replaceAll('-', '').length < 10) {
             setIsbnExists(false);
+            setIsbnTen(false);
             return;
         };
 
         const res = await HandleISBN(inputISBN.replaceAll("-", ''));
 
         setIsbnTen(res.isbnTen);
+        console.log("break 1");
         if (res.isbnTen) {
             setIsbnExists(false);
             return;

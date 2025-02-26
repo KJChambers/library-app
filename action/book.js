@@ -18,10 +18,10 @@ export async function AddBookRedirect() {
 export async function HandleISBN(ISBN) {
     await connectDB();
     const existingBook = await Book.findOne({ ISBN });
-    if (existingBook) return { isbnExists: true, ISBN };
-    const res = await fetch(`https://openlibrary.org/isbn/${ISBN}.json`);
     let bookData = null;
     let isbnTen = false;
+    if (existingBook) return { isbnExists: true, ISBN, bookData, isbnTen };
+    const res = await fetch(`https://openlibrary.org/isbn/${ISBN}.json`);
     if (res.status === 200) {
         bookData = await res.json();
         if (bookData.isbn_10.includes(ISBN)) isbnTen = true;

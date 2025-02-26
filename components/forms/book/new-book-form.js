@@ -23,8 +23,9 @@ export default function NewBookForm({ action, userData }) {
     const [open, setOpen] = useState(false);
 
     const handleIsbnChange = async (ISBN) => {
-        if (ISBN.trim().replaceAll('-', '').length !== 10) {
+        if (ISBN.trim().replaceAll('-', '').length !== 10 && ISBN.trim().replaceAll('-', '').length !== 13) {
             setIsbnExists(false);
+            setIsbnTen(false);
             setOpen(false);
             return;
         };
@@ -45,8 +46,9 @@ export default function NewBookForm({ action, userData }) {
             return;
         }
         setBookData(bookData);
-        const authorData = await fetchAuthorFromKey(bookData.authors[0].key);
-        setAuthorPrev(authorData.name || authorData.personal_name);
+        let authorData = {};
+        if (bookData.authors) authorData = await fetchAuthorFromKey(bookData.authors[0].key);
+        setAuthorPrev(authorData.name || authorData.personal_name || "Unknown Author");
         setOpen(true);
     };
 
