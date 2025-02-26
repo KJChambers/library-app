@@ -3,11 +3,9 @@
 import DatePicker, { registerLocale } from "react-datepicker";
 import { enGB } from 'date-fns/locale/en-GB';
 import "react-datepicker/dist/react-datepicker.css";
-import { useState } from "react";
 
-export default function DateSelect() {
+export default function DateSelect({ date, setDate }) {
     registerLocale('gb', enGB);
-    const [publishDate, setPublishDate] = useState(new Date());
 
     return (
         <div>
@@ -23,8 +21,8 @@ export default function DateSelect() {
             <div className="mt-2">
                 <DatePicker
                     locale="gb"
-                    selected={publishDate}
-                    onChange={(date) => setPublishDate(date)}
+                    selected={date}
+                    onChange={(date) => setDate(date)}
                     dateFormat="dd-MM-yyyy"
                     maxDate={new Date()}
                     minDate={new Date("1970-01-01")}
@@ -34,7 +32,7 @@ export default function DateSelect() {
                     showMonthDropdown
                     className="block w-full rounded-md bg-white dark:bg-slate-500 px-3 py-1.5 text-base text-violet-950 dark:text-violet-100 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 dark:placeholder:text-violet-100/50 focus:outline-2 focus:-outline-offset-2 focus:outline-violet-600 dark:focus:outline-violet-400 sm:text-sm/6"
                 />
-                <input type="hidden" name="pubDate" value={publishDate.toISOString()} />
+                <input type="hidden" name="pubDate" value={date.toISOString()} />
             </div>
         </div>
     );

@@ -1,14 +1,13 @@
 import { getSession } from "@/lib/get-session";
 import { User } from "@/models/user";
 import { notFound } from "next/navigation";
-import pfp from "@/public/obi-wan.jpg"
 import Image from "next/image";
 import connectDB from "@/lib/db";
 import Link from "next/link";
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
 import SocialLinks from "@/components/social-links";
 import BookChamber from "@/components/book/book-chamber";
-import AddBookButton from "@/components/book/add-book-button";
+import AddBookButton from "@/components/book/buttons/add-book-button";
 
 export default async function ProfilePage({ params }) {
     const { username } = await params;

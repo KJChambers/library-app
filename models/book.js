@@ -7,7 +7,7 @@ const bookSchema = new mongoose.Schema({
     categories: [ String ],
     publisher: String,
     pub_date: String,
-    ISBN: { type: String, required: true },
+    ISBN: { type: String, required: true, unique: true },
     pages: Number
 });
 

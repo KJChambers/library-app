@@ -1,6 +1,6 @@
 'use client';
 
-import { AddBookRedirect, SearchRedirect } from "@/action/add-book";
+import { AddBookRedirect, SearchRedirect } from "@/action/book";
 import { Description, Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { useState } from "react";
 
@@ -23,7 +23,7 @@ export default function AddBookButton() {
                         <p className="mt-2 font-bold">Choose how you would like to add a book</p>
                         <div className="flex justify-center gap-4">
                             <form action={SearchRedirect}>
-                                <button 
+                                <button
                                     type="submit"
                                     className="px-3 py-2 mt-2 cursor-pointer font-semibold bg-violet-600 dark:bg-violet-700 text-violet-100 hover:bg-violet-500 dark:hover:bg-violet-600 rounded-md shadow-xs"
                                 >

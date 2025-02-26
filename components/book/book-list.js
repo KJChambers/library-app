@@ -1,8 +1,8 @@
 'use client';
 
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import CoverImage from "./cover-image";
 
 export default function BookList({ books, className }) {
     if (books.length === 0) return <p className="col-span-full text-center text-violet-950 dark:text-violet-100">No books to show!</p>;
@@ -23,13 +23,7 @@ export default function BookList({ books, className }) {
                         onClick={() => router.push(`/books/${book.ISBN}`)}
                     >
                         <div className="relative mx-auto w-44 aspect-5/8 md:w-full h-auto overflow-hidden">
-                            <Image
-                                src={`https://covers.openlibrary.org/b/isbn/${book.ISBN}-M.jpg`}
-                                alt={`Upload a cover at https://openlibrary.org/isbn/${book.ISBN}`}
-                                fill
-                                sizes="100%"
-                                className="rounded-md object-cover"
-                            />
+                            <CoverImage book={JSON.parse(JSON.stringify(book))} />
                         </div>
                         <h1 className="mt-2 text-base/5 font-bold">{book.title}</h1>
                         <p className="mt-2 text-sm">{book.authors}</p>

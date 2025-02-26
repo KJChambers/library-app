@@ -7,7 +7,7 @@ import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { del, put } from "@vercel/blob";
 
 async function updateUserProfile(prevState, formData) {
-    const requiredFields= ["firstName", "lastName", "username"];
+    const requiredFields = ["firstName", "lastName", "username"];
     const userData = Object.fromEntries(requiredFields.map(field => [field, formData.get(field).trim()]));
     userData.bio = formData.get("bio") || "";
     userData.email = formData.get("email");

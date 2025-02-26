@@ -1,4 +1,4 @@
-import { AddBook } from "@/action/add-book";
+import { AddBook } from "@/action/book";
 import NewBookForm from "@/components/forms/book/new-book-form";
 import connectDB from "@/lib/db";
 import { getSession } from "@/lib/get-session";
