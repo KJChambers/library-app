@@ -58,14 +58,13 @@ export async function AddBook(prevState, formData) {
 
         if (!/^\d+$/.test(cleanedISBN)) errors.add("ISBN must only contain numbers.");
         if (cleanedISBN.length !== 13) errors.add("ISBN must be 13 digits");
-    }
+    };
 
     if (!title || !desc) errors.add("Title and description required.");
-    if (title.length < 5) errors.add("Title must be at least 5 characters.");
     if (!titleDescRegex.test(title)) errors.add("Title contains invalid characters");
     if (desc.length < 25) errors.add("Description must be at least 25 characters.");
     if (!titleDescRegex.test(desc)) errors.add("Description contains invalid characters");
-    if (pages !== null && pages < 1) errors.add("Pages cannot be 0 - leave it blank if you are unsure.");
+    if (pages && pages < 1) errors.add("Pages cannot be 0 - leave it blank if you are unsure.");
     if (!authorsRegex.test(authors)) errors.add("Authors should only contain letters, spaces, and commas.");
     if (!publisherRegex.test(publisher)) errors.add("Publisher should only contain letters and spaces.");
 
@@ -137,7 +136,7 @@ export async function editBook(prevState, formData) {
         if (!/^\d+$/.test(cleanedISBN) || cleanedISBN.length !== 13) errors.add("ISBN must be a 13 digit number.");
     }
 
-    if (!title || title.length < 5 || !titleDescRegex.test(title)) errors.add("Title must be at least 5 characters and not contain invalid letters");
+    if (!title || !titleDescRegex.test(title)) errors.add("Title must be at least 5 characters and not contain invalid letters");
     if (!desc || desc.length < 25 || !titleDescRegex.test(desc)) errors.add("Description must be at least 25 characters and not contain invalid letters");
     if (pages && pages < 1) errors.add("Pages cannot be 0. Leave it blank if you are unsure.");
     if (!authorsRegex.test(authors)) errors.add("Authors should only contain letters, spaces, and commas.");
