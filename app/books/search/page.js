@@ -7,7 +7,8 @@ import Link from "next/link";
 export default async function SearchResultsPage({ searchParams }) {
     const params = await searchParams;
     const query = params.query?.replaceAll('-', ' ') || "";
-    const category = params.category?.replaceAll('-', ' ') || "";
+    let category = params.category?.replaceAll('-', ' ') || "";
+    if (category === "Self help") category = "Self-help";
 
     let books = [];
     if (query || category) {

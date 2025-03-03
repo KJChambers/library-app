@@ -17,16 +17,14 @@ export async function AddBookRedirect() {
 
 export async function HandleISBN(ISBN) {
     await connectDB();
-    const existingBook = await Book.findOne({ ISBN });
-    let bookData = null;
-    let isbnTen = false;
-    if (existingBook) return { isbnExists: true, ISBN, bookData, isbnTen };
+    const existingBook = await Book.findOne({ ISBN }).lean();
+    if (existingBook) return { isbnExists: true, bookData: JSON.parse(JSON.stringify(existingBook)), isbnTen: false };
+
     const res = await fetch(`https://openlibrary.org/isbn/${ISBN}.json`);
-    if (res.status === 200) {
-        bookData = await res.json();
-        if (bookData.isbn_10.includes(ISBN)) isbnTen = true;
-    };
-    return { isbnExists: false, ISBN: null, bookData, isbnTen };
+    if (res.status !== 200) return { isbnExists: false, bookData: null };
+
+    const bookData = await res.json();
+    return { isbnExists: false, bookData, isbnTen: bookData.isbn_10?.includes(ISBN) };
 }
 
 export async function fetchAuthorFromKey(key) {
@@ -44,12 +42,13 @@ export async function AddBook(prevState, formData) {
     const publisher = formData.get("publisher")?.trim() || "Unknown";
     const pubDate = formData.get("pubDate") ? formData.get("pubDate").substring(0, 10) : "Unknown";
     const username = formData.get("username");
+    const works = formData.get("works");
 
     const errors = new Set();
 
     const titleDescRegex = /^[^<>={}]+$/;
-    const authorsRegex = /^[a-zA-Z\s,]+$/;
-    const publisherRegex = /^[a-zA-Z\s]+$/;
+    const authorsRegex = /^[a-zA-Z\s,.]+$/;
+    const publisherRegex = /^[a-zA-Z\s,.&]+$/;
 
     if (!ISBN) errors.add("ISBN is required.");
 
@@ -64,9 +63,9 @@ export async function AddBook(prevState, formData) {
     if (!titleDescRegex.test(title)) errors.add("Title contains invalid characters");
     if (desc.length < 25) errors.add("Description must be at least 25 characters.");
     if (!titleDescRegex.test(desc)) errors.add("Description contains invalid characters");
-    if (pages && pages < 1) errors.add("Pages cannot be 0 - leave it blank if you are unsure.");
-    if (!authorsRegex.test(authors)) errors.add("Authors should only contain letters, spaces, and commas.");
-    if (!publisherRegex.test(publisher)) errors.add("Publisher should only contain letters and spaces.");
+    if (pages && pages < 1) errors.add("Pages cannot be 0 - leave blank if unsure.");
+    if (!authorsRegex.test(authors)) errors.add("Author(s) contains invalid characters..");
+    if (!publisherRegex.test(publisher)) errors.add("Publisher contains invalid characters.");
 
     if (errors.size > 0) return { errors: Array.from(errors), payload: formData };
 
@@ -96,7 +95,10 @@ export async function AddBook(prevState, formData) {
                 publisher,
                 pub_date: pubDate,
                 ISBN: cleanedISBN,
-                ...(pages && { pages }),
+                works: [{
+                    key: works
+                }],
+                ...(pages && { pages })
             }),
             User.findOne({ username })
         ]);

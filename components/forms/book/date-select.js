@@ -37,3 +37,13 @@ export default function DateSelect({ date, setDate }) {
         </div>
     );
 }
+
+export const dateFormats = [
+    "MMMM YYYY",
+    "YYYY-MM-DD",
+    "MM-DD-YYYY",
+    "DD-MM-YYYY",
+    "MMM YYYY",
+    "D MMMM YYYY",
+    "YYYY"
+]

@@ -29,7 +29,11 @@ export default async function BookInfoPage({ params }) {
 
     const bookData = {
         ...rawBookData,
-        _id: rawBookData._id.toString()
+        _id: rawBookData._id.toString(),
+        works: rawBookData.works.map(work => ({
+            ...work,
+            _id: work._id.toString()
+        }))
     };
 
     let userData = null;
@@ -47,8 +51,11 @@ export default async function BookInfoPage({ params }) {
         userHasBook = userData.saved_books.some(book => book.bookId === bookData._id.toString());
     }
 
-    const isbnTen = await fetchIsbnTen(bookData.ISBN);
-    const waterstones = await fetchWaterstones(bookData.ISBN);
+    const [isbnTen, waterstones, userList] = await Promise.all([
+        fetchIsbnTen(bookData.ISBN),
+        fetchWaterstones(bookData.ISBN),
+        User.find({ "saved_books.bookId": bookData._id })
+    ]);
 
     const initDate = new Date(bookData.pub_date);
     const options = {
@@ -104,6 +111,7 @@ export default async function BookInfoPage({ params }) {
                         <p className="font-bold text-xl">{bookData.title}</p>
                         <p className="font-semibold">By {bookData.authors}</p>
                         <BookDesc desc={bookData.desc} />
+                        <p className="font-semibold">{userList.length} {userList.length === 1 ? "person owns" : "people own"} this book!</p>
                         <CategoryList book={bookData} user={userData} />
                         <ul>
                             <li><strong>ISBN 13:</strong> {bookData.ISBN}</li>

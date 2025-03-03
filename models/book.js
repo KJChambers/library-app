@@ -8,7 +8,10 @@ const bookSchema = new mongoose.Schema({
     publisher: String,
     pub_date: String,
     ISBN: { type: String, required: true, unique: true },
-    pages: Number
+    pages: Number,
+    works: [{
+        key: String
+    }]
 });
 
 export const Book = mongoose.models?.Book || mongoose.model("Book", bookSchema);

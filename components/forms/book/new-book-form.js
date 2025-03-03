@@ -3,17 +3,20 @@
 import { useActionState, useState } from "react";
 import CategorySelect from "./category-select";
 import NewBookSubmitButton from "./new-book-submit";
-import DateSelect from "./date-select";
+import DateSelect, { dateFormats } from "./date-select";
 import Link from "next/link";
 import { fetchAuthorFromKey, HandleISBN } from "@/action/book";
+import { fetchWorks } from "@/lib/book";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 
 export default function NewBookForm({ action, userData }) {
     const [state, formAction] = useActionState(action, {});
     const [desc, setDesc] = useState("");
     const [isbnExists, setIsbnExists] = useState(false);
-    const [ISBN, setISBN] = useState(null);
     const [isbnTen, setIsbnTen] = useState(false);
     const [bookData, setBookData] = useState({});
+    const [worksData, setWorksData] = useState({});
     const [authorPrev, setAuthorPrev] = useState("");
     const [title, setTitle] = useState("");
     const [publisher, setPublisher] = useState("");
@@ -22,42 +25,44 @@ export default function NewBookForm({ action, userData }) {
     const [pages, setPages] = useState(null);
     const [open, setOpen] = useState(false);
 
-    const handleIsbnChange = async (ISBN) => {
-        if (ISBN.trim().replaceAll('-', '').length !== 10 && ISBN.trim().replaceAll('-', '').length !== 13) {
-            setIsbnExists(false);
-            setIsbnTen(false);
-            setOpen(false);
-            return;
-        };
+    const handleIsbnChange = async (inputISBN) => {
+        const cleanISBN = inputISBN.replace(/-/g, '').trim();
+        if (![10, 13].includes(cleanISBN.length)) return resetState();
 
-        const res = await HandleISBN(ISBN.replaceAll("-", ''));
+        const res = await HandleISBN(cleanISBN);
+        if (res.isbnExists) return setIsbnExists(true);
         
+        setBookData(res.bookData || {});
         setIsbnTen(res.isbnTen);
-        if (res.isbnTen) {
-            setIsbnExists(false);
-            setOpen(false);
-            return;
+        setIsbnExists(false);
+
+        if (res.isbnTen || !res.bookData) return;
+
+        const worksDataRes = res.bookData.works?.[0]?.key ? await fetchWorks(res.bookData.works[0].key) : {};
+        setWorksData(worksDataRes);
+
+        const authorKey = res.bookData.authors?.[0]?.key || worksDataRes.authors?.[0]?.author.key;
+        if (authorKey) {
+            const authorData = await fetchAuthorFromKey(authorKey);
+            setAuthorPrev(authorData.name || authorData.personal_name || "Unknown Author");
         };
-        setIsbnExists(res.isbnExists);
-        setISBN(res.ISBN);
-        
-        const bookData = res.bookData;
-        if (!bookData) {
-            return;
-        }
-        setBookData(bookData);
-        let authorData = {};
-        if (bookData.authors) authorData = await fetchAuthorFromKey(bookData.authors[0].key);
-        setAuthorPrev(authorData.name || authorData.personal_name || "Unknown Author");
         setOpen(true);
     };
 
     const autofillData = () => {
-        setTitle(bookData.title);
-        setAuthor(authorPrev);
-        setPublisher(bookData.publishers[0]);
-        setPubDate(new Date(bookData.publish_date));
-        setPages(bookData.number_of_pages);
+        setTitle(bookData.title || "");
+        setDesc(worksData.description || "");
+        setAuthor(authorPrev || "");
+        setPublisher(bookData.publishers?.[0] || "");
+        dayjs.extend(customParseFormat);
+        setPubDate(dayjs(bookData.publish_date, dateFormats).toDate() || new Date());
+        setPages(bookData.number_of_pages || "");
+        setOpen(false);
+    }
+
+    const resetState = () => {
+        setIsbnExists(false);
+        setIsbnTen(false);
         setOpen(false);
     }
 
@@ -88,13 +93,13 @@ export default function NewBookForm({ action, userData }) {
                 </div>
                 {isbnExists && (
                     <div className="text-red-500">
-                        <span>ISBN already exists in our archives - </span>
-                        <Link className="text-violet-700 dark:text-violet-100 hover:text-violet-500 dark:hover:text-violet-300" href={`/books/${ISBN}`}>Go to book page!</Link>
+                        <span>ISBN exists - </span>
+                        <Link className="text-violet-700 dark:text-violet-100 hover:text-violet-500 dark:hover:text-violet-300" href={`/books/${bookData.ISBN}`}>Go to book page!</Link>
                     </div>
                 )}
                 {isbnTen && (
                     <div className="text-red-500">
-                        <span>Seems like you've input an ISBN 10. Please use ISBN 13.</span>
+                        <span>Using ISBN-10. Use ISBN-13: {bookData.isbn_13?.[0]}</span>
                     </div>
                 )}
                 {open && (
@@ -221,6 +226,7 @@ export default function NewBookForm({ action, userData }) {
             </div>
 
             <input type="hidden" value={userData.username} name="username" />
+            <input type="hidden" value={bookData?.works?.[0]?.key || ""} name="works" />
 
         </form>
     )

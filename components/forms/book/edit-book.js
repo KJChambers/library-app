@@ -5,13 +5,15 @@ import EditBookButton from "./edit-book-submit";
 import DateSelect from "./date-select";
 import { HandleISBN } from "@/action/book";
 import Link from "next/link";
+import { fetchWorks } from "@/lib/book";
 
 export default function EditBookForm({ action, book }) {
     const [state, formAction] = useActionState(action, {});
     const [isbnExists, setIsbnExists] = useState(false);
     const [isbnTen, setIsbnTen] = useState(false);
-    const [bookPrev, setBookPrev] = useState(null);
+    const [bookPrev, setBookPrev] = useState({});
     const [authorPrev, setAuthorPrev] = useState(null);
+    const [worksData, setWorksData] = useState({});
     const [open, setOpen] = useState(false);
     const [submitted, setSubmitted] = useState(false);
 
@@ -25,40 +27,44 @@ export default function EditBookForm({ action, book }) {
 
     const handleIsbnChange = async (inputISBN) => {
         setISBN(inputISBN);
+        const cleanISBN = inputISBN.replace(/-/g, '').trim();
+        if (![10, 13].includes(cleanISBN.length)) return resetState();
 
-        if (inputISBN.trim().replaceAll('-', '').length < 10) {
-            setIsbnExists(false);
-            setIsbnTen(false);
-            return;
-        };
+        const res = await HandleISBN(cleanISBN);
+        if (res.isbnExists) return setIsbnExists(true);
 
-        const res = await HandleISBN(inputISBN.replaceAll("-", ''));
-
+        setBookPrev(res.bookData);
         setIsbnTen(res.isbnTen);
-        console.log("break 1");
-        if (res.isbnTen) {
-            setIsbnExists(false);
-            return;
-        };
         setIsbnExists(res.isbnExists);
-                
-        const bookData = res.bookData;
-        if (!bookData) {
-            return;
-        }
-        setBookPrev(bookData);
-        const authorData = await fetchAuthorFromKey(bookData.authors[0].key);
-        setAuthorPrev(authorData.name || authorData.personal_name);
+
+        if (res.isbnTen || !res.bookData) return;
+
+        const worksDataRes = await fetchWorks(bookData.works[0].key);
+        setWorksData(worksDataRes);
+
+        const authorKey = res.bookData.authors?.[0]?.key || worksDataRes.authors?.[0]?.author.key;
+        if (authorKey) {
+            const authorData = await fetchAuthorFromKey(authorKey);
+            setAuthorPrev(authorData.name || authorData.personal_name || "Unknown Author");
+        };
         setOpen(true);
     };
 
     const autofillData = () => {
-        setTitle(bookPrev.title);
-        setAuthor(authorPrev);
-        setPublisher(bookPrev.publishers[0]);
-        setPages(bookPrev.number_of_pages);
+        setTitle(bookData.title || "");
+        setDesc(worksData.description || "");
+        setAuthor(authorPrev || "");
+        setPublisher(bookData.publishers?.[0] || "");
+        setPubDate(new Date(bookData.publish_date) || new Date());
+        setPages(bookData.number_of_pages || "");
         setOpen(false);
     };
+
+    const resetState = () => {
+        setIsbnExists(false);
+        setIsbnTen(false);
+        setOpen(false);
+    }
 
     useEffect(() => {
         if (state.success) setSubmitted(true);

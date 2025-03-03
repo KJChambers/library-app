@@ -9,7 +9,7 @@ export default function BookDesc({ desc }) {
     return (
         <p className="whitespace-pre-line">
             {isExpanded ? desc : truncatedText}
-            {desc.length > 150 && (
+            {desc.length > 250 && (
                 <button
                     onClick={() => setExpanded(!isExpanded)}
                     className="text-violet-500 hover:text-violet-700 ml-2 cursor-pointer"
