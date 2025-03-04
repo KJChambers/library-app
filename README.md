@@ -3,6 +3,7 @@
 ## Roadmap
 
 **Done**
+
 - Login Page
 - Register Page
 - Forgot Password Page
@@ -17,6 +18,7 @@
 - Library Functionality (finally done!)
 
 **Left to Do**
+
 - Update email
 - Main Home Page
 - Quality of Life additions
