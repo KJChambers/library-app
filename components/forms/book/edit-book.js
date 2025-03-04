@@ -2,10 +2,12 @@
 
 import { startTransition, useActionState, useEffect, useState } from "react";
 import EditBookButton from "./edit-book-submit";
-import DateSelect from "./date-select";
-import { HandleISBN } from "@/action/book";
+import DateSelect, { dateFormats } from "./date-select";
+import { fetchAuthorFromKey, HandleISBN } from "@/action/book";
 import Link from "next/link";
 import { fetchWorks } from "@/lib/book";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 
 export default function EditBookForm({ action, book }) {
     const [state, formAction] = useActionState(action, {});
@@ -23,23 +25,25 @@ export default function EditBookForm({ action, book }) {
     const [author, setAuthor] = useState(book.authors);
     const [pages, setPages] = useState(book.pages);
     const [publisher, setPublisher] = useState(book.publisher);
-    const [pubDate, setPubDate] = useState(new Date(book.pub_date));
+    const [pubDate, setPubDate] = useState(dayjs(book.pub_date, dateFormats).toDate());
 
     const handleIsbnChange = async (inputISBN) => {
         setISBN(inputISBN);
+
         const cleanISBN = inputISBN.replace(/-/g, '').trim();
         if (![10, 13].includes(cleanISBN.length)) return resetState();
 
         const res = await HandleISBN(cleanISBN);
+
+        setBookPrev(res.bookData || {});
         if (res.isbnExists) return setIsbnExists(true);
 
-        setBookPrev(res.bookData);
         setIsbnTen(res.isbnTen);
         setIsbnExists(res.isbnExists);
 
         if (res.isbnTen || !res.bookData) return;
 
-        const worksDataRes = await fetchWorks(bookData.works[0].key);
+        const worksDataRes = await fetchWorks(res.bookData.works[0].key);
         setWorksData(worksDataRes);
 
         const authorKey = res.bookData.authors?.[0]?.key || worksDataRes.authors?.[0]?.author.key;
@@ -51,12 +55,13 @@ export default function EditBookForm({ action, book }) {
     };
 
     const autofillData = () => {
-        setTitle(bookData.title || "");
+        setTitle(bookPrev.title || "");
         setDesc(worksData.description || "");
         setAuthor(authorPrev || "");
-        setPublisher(bookData.publishers?.[0] || "");
-        setPubDate(new Date(bookData.publish_date) || new Date());
-        setPages(bookData.number_of_pages || "");
+        setPublisher(bookPrev.publishers?.[0] || "");
+        dayjs.extend(customParseFormat);
+        setPubDate(dayjs(bookPrev.publish_date, dateFormats).toDate() || new Date());
+        setPages(bookPrev.number_of_pages || "");
         setOpen(false);
     };
 
@@ -124,7 +129,7 @@ export default function EditBookForm({ action, book }) {
                             className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 cursor-pointer"
                             onClick={() => autofillData()}
                         >
-                            <p className="font-semibold">{bookData.title}</p>
+                            <p className="font-semibold">{bookPrev.title}</p>
                             <p className="text-sm text-gray-600 dark:text-gray-300/80">{authorPrev}</p>
                         </div>
                     </div>

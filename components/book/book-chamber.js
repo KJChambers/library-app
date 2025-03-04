@@ -11,5 +11,5 @@ export default async function BookChamber({ userData }) {
 
     const bookList = await Book.find({ _id: { $in: bookIds } });
 
-    return <BookList books={JSON.parse(JSON.stringify(bookList))} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 justify-items-stretch gap-10" />
+    return <BookList books={JSON.parse(JSON.stringify(bookList))} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 justify-items-stretch gap-10" scrollable />
 }

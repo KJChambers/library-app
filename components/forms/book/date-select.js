@@ -41,6 +41,8 @@ export default function DateSelect({ date, setDate }) {
 export const dateFormats = [
     "MMMM YYYY",
     "YYYY-MM-DD",
+    "MMM DD, YYYY",
+    "DD.MM.YYYY",
     "MM-DD-YYYY",
     "DD-MM-YYYY",
     "MMM YYYY",

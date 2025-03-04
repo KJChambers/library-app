@@ -1,17 +1,22 @@
 import { editBook } from "@/action/book";
 import BookDesc from "@/components/book/book-desc";
+import BookList from "@/components/book/book-list";
 import { AddExistingBookButton, NoUserButton, RemoveBookButton } from "@/components/book/buttons/book-page-buttons";
 import CategoryList from "@/components/book/category-list";
 import CoverImage from "@/components/book/cover-image";
+import { dateFormats } from "@/components/forms/book/date-select";
 import EditBookForm from "@/components/forms/book/edit-book";
 import { fetchIsbnTen, fetchWaterstones } from "@/lib/book";
 import connectDB from "@/lib/db";
 import { getSession } from "@/lib/get-session"
 import { Book } from "@/models/book";
 import { User } from "@/models/user";
+import dayjs from "dayjs";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { FaAmazon, FaShoppingCart } from "react-icons/fa";
+
+
 
 export default async function BookInfoPage({ params }) {
     await connectDB();
@@ -51,19 +56,14 @@ export default async function BookInfoPage({ params }) {
         userHasBook = userData.saved_books.some(book => book.bookId === bookData._id.toString());
     }
 
-    const [isbnTen, waterstones, userList] = await Promise.all([
+    const [isbnTen, waterstones, userList, bookEditions] = await Promise.all([
         fetchIsbnTen(bookData.ISBN),
         fetchWaterstones(bookData.ISBN),
-        User.find({ "saved_books.bookId": bookData._id })
+        User.find({ "saved_books.bookId": bookData._id }),
+        Book.find({ "works.key": bookData.works[0].key })
     ]);
 
-    const initDate = new Date(bookData.pub_date);
-    const options = {
-        day: "numeric",
-        month: "short",
-        year: "numeric"
-    }
-    const pubDate = new Intl.DateTimeFormat("en-GB", options).format(initDate).replace(/(\d{1,2} \w{3}) (\d{4})/, "$1, $2");
+    const pubDate = dayjs(bookData.pub_date, dateFormats).format("DD MMM, YYYY");
 
     return (
         <div>
@@ -86,7 +86,7 @@ export default async function BookInfoPage({ params }) {
                             {isbnTen && (
                                 <a
                                     href={`https://amazon.co.uk/dp/${isbnTen}`}
-                                    className="flex items-center justify-center gap-2 py-3 mb-2 w-full text-violet-950 dark:text-violet-100 bg-white dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-600 outline-2 outline-gray-300 cursor-pointer mx-auto rounded-md"
+                                    className="flex items-center justify-center gap-2 px-2 py-3 mb-2 w-full text-violet-950 dark:text-violet-100 bg-white dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-600 outline-2 outline-gray-300 cursor-pointer mx-auto rounded-md"
                                     rel="noopener noreferrer"
                                     target="_blank"
                                 >
@@ -97,7 +97,7 @@ export default async function BookInfoPage({ params }) {
                             {waterstones && (
                                 <a
                                     href={`https://waterstones.com/book/${ISBN}`}
-                                    className="flex items-center justify-center gap-2 py-3 mb-2 w-full text-violet-950 dark:text-violet-100 bg-white dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-600 outline-2 outline-gray-300 cursor-pointer mx-auto rounded-md"
+                                    className="flex items-center justify-center gap-2 px-2 py-3 mb-2 w-full text-violet-950 dark:text-violet-100 bg-white dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-600 outline-2 outline-gray-300 cursor-pointer mx-auto rounded-md"
                                     rel="noopener noreferrer"
                                     target="_blank"
                                 >
@@ -111,7 +111,11 @@ export default async function BookInfoPage({ params }) {
                         <p className="font-bold text-xl">{bookData.title}</p>
                         <p className="font-semibold">By {bookData.authors}</p>
                         <BookDesc desc={bookData.desc} />
-                        <p className="font-semibold">{userList.length} {userList.length === 1 ? "person owns" : "people own"} this book!</p>
+                        {userList.length === 0 ? (
+                            <p className="font-semibold">Be the first to own this book!</p>
+                        ) : (
+                            <p className="font-semibold">{userList.length} {userList.length === 1 ? "person owns" : "people own"} this book!</p>
+                        )}
                         <CategoryList book={bookData} user={userData} />
                         <ul>
                             <li><strong>ISBN 13:</strong> {bookData.ISBN}</li>
@@ -119,9 +123,16 @@ export default async function BookInfoPage({ params }) {
                             <li><strong>Pages:</strong> {bookData.pages}</li>
                             <li><strong>Publisher:</strong> {bookData.publisher}</li>
                             <li><strong>Published:</strong> {pubDate}</li>
+                            {bookData.works[0].key && (<li><strong>Editions:</strong> {bookEditions.length}</li>)}
                         </ul>
                     </div>
                 </div>
+                {bookData.works[0].key && (
+                    <div className="col-span-full">
+                        <p className="mt-10 font-bold text-2xl">All Editions:</p>
+                        <BookList books={JSON.parse(JSON.stringify(bookEditions))} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 justify-items-stretch gap-10" publisher={true} date={true} />
+                    </div>
+                )}
             </div>
             <div className="p-6 my-7 mx-auto w-full md:w-2xl lg:w-5xl rounded-md shadow-xs bg-white dark:bg-slate-900 text-violet-950 dark:text-violet-100">
                 {userData ? (

@@ -24,11 +24,12 @@ export async function HandleISBN(ISBN) {
     if (res.status !== 200) return { isbnExists: false, bookData: null };
 
     const bookData = await res.json();
-    return { isbnExists: false, bookData, isbnTen: bookData.isbn_10?.includes(ISBN) };
+    return { isbnExists: false, bookData, isbnTen: bookData.isbn_10?.includes(ISBN.toUpperCase()) };
 }
 
 export async function fetchAuthorFromKey(key) {
     const res = await fetch(`https://openlibrary.org/${key}.json`);
+    if (res.status !== 200) return;
     return await res.json();
 }
 
@@ -47,8 +48,8 @@ export async function AddBook(prevState, formData) {
     const errors = new Set();
 
     const titleDescRegex = /^[^<>={}]+$/;
-    const authorsRegex = /^[a-zA-Z\s,.]+$/;
-    const publisherRegex = /^[a-zA-Z\s,.&]+$/;
+    const authorsRegex = /^[a-zA-Z\s,.-]+$/;
+    const publisherRegex = /^[a-zA-Z\s,.&-]+$/;
 
     if (!ISBN) errors.add("ISBN is required.");
 
@@ -129,8 +130,8 @@ export async function editBook(prevState, formData) {
 
     const errors = new Set();
     const titleDescRegex = /^[^<>={}]+$/;
-    const authorsRegex = /^[a-zA-Z\s,]+$/;
-    const publisherRegex = /^[a-zA-Z\s]+$/;
+    const authorsRegex = /^[a-zA-Z\s,.-]+$/;
+    const publisherRegex = /^[a-zA-Z\s,.&-]+$/;
 
     if (!ISBN) errors.add("ISBN is required.");
     else {
@@ -138,11 +139,11 @@ export async function editBook(prevState, formData) {
         if (!/^\d+$/.test(cleanedISBN) || cleanedISBN.length !== 13) errors.add("ISBN must be a 13 digit number.");
     }
 
-    if (!title || !titleDescRegex.test(title)) errors.add("Title must be at least 5 characters and not contain invalid letters");
+    if (!title || !titleDescRegex.test(title)) errors.add("Title must be present and not contain invalid characters");
     if (!desc || desc.length < 25 || !titleDescRegex.test(desc)) errors.add("Description must be at least 25 characters and not contain invalid letters");
-    if (pages && pages < 1) errors.add("Pages cannot be 0. Leave it blank if you are unsure.");
-    if (!authorsRegex.test(authors)) errors.add("Authors should only contain letters, spaces, and commas.");
-    if (!publisherRegex.test(publisher)) errors.add("Publisher should only contain letters and spaces.");
+    if (pages && pages < 1) errors.add("Pages cannot be 0. Leave blank if unsure.");
+    if (!authorsRegex.test(authors)) errors.add("Author(s) has invalid characters.");
+    if (!publisherRegex.test(publisher)) errors.add("Publisher has invalid characters.");
 
     if (errors.size > 0) return { errors: Array.from(errors) };
 

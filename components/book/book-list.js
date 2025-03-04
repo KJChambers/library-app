@@ -1,10 +1,10 @@
 'use client';
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CoverImage from "./cover-image";
 
-export default function BookList({ books, className }) {
+export default function BookList({ books, className, publisher = false, date = false, scrollable = false }) {
     if (books.length === 0) return <p className="col-span-full text-center text-violet-950 dark:text-violet-100">No books to show!</p>;
 
     const router = useRouter();
@@ -13,6 +13,17 @@ export default function BookList({ books, className }) {
     const showMoreBooks = () => {
         setVisibleCount((prev) => prev + 4);
     }
+
+    useEffect(() => {
+        if (!scrollable) return;
+
+        const handleScroll = () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 50) showMoreBooks();
+        }
+
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, [scrollable]);
 
     return (
         <div className={`mt-10 ${className} text-center md:text-left text-violet-950 dark:text-violet-100`}>
@@ -27,10 +38,13 @@ export default function BookList({ books, className }) {
                         </div>
                         <h1 className="mt-2 text-base/5 font-bold">{book.title}</h1>
                         <p className="mt-2 text-sm">{book.authors}</p>
+                        {(publisher || date) && (
+                            <p className="mt-2 text-sm">{date ? book.pub_date : ""}{publisher ? ", " + book.publisher : ""}</p>
+                        )}
                     </div>
                 ))}
 
-                {visibleCount < books.length && (
+                {!scrollable && (visibleCount < books.length) && (
                     <div className="col-span-full flex justify-center mt-4">
                         <button
                             onClick={showMoreBooks}

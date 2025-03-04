@@ -30,9 +30,10 @@ export default function NewBookForm({ action, userData }) {
         if (![10, 13].includes(cleanISBN.length)) return resetState();
 
         const res = await HandleISBN(cleanISBN);
+
+        setBookData(res.bookData || {});
         if (res.isbnExists) return setIsbnExists(true);
         
-        setBookData(res.bookData || {});
         setIsbnTen(res.isbnTen);
         setIsbnExists(false);
 
