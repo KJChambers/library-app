@@ -32,9 +32,9 @@ export default function NewBookForm({ action, userData }) {
 		const res = await HandleISBN(cleanISBN);
 
 		setBookData(res.bookData || {});
-		if (res.isbnExists) return setIsbnExists(true);
-
 		setIsbnTen(res.isbnTen);
+
+		if (res.isbnExists) return setIsbnExists(true);
 		setIsbnExists(false);
 
 		if (res.isbnTen || !res.bookData) return;
@@ -58,7 +58,11 @@ export default function NewBookForm({ action, userData }) {
 
 	const autofillData = () => {
 		setTitle(bookData.title || "");
-		setDesc(worksData.description || "");
+		setDesc(
+			worksData.description?.value
+				? worksData.description.value
+				: worksData.description || ""
+		);
 		setAuthor(authorPrev || "");
 		setPublisher(bookData.publishers?.[0] || "");
 		dayjs.extend(customParseFormat);
@@ -119,7 +123,10 @@ export default function NewBookForm({ action, userData }) {
 				{isbnTen && (
 					<div className="text-red-500">
 						<span>
-							Using ISBN-10. Use ISBN-13: {bookData.isbn_13?.[0]}
+							Using ISBN-10.{" "}
+							{bookData.isbn_13
+								? `Use ISBN-13: ${bookData.isbn_13?.[0]}`
+								: "Can't find ISBN-13 for this book!"}
 						</span>
 					</div>
 				)}

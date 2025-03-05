@@ -62,7 +62,11 @@ export default function EditBookForm({ action, book }) {
 
 	const autofillData = () => {
 		setTitle(bookPrev.title || "");
-		setDesc(worksData.description || "");
+		setDesc(
+			worksData.description?.value
+				? worksData.description.value
+				: worksData.description || ""
+		);
 		setAuthor(authorPrev || "");
 		setPublisher(bookPrev.publishers?.[0] || "");
 		dayjs.extend(customParseFormat);

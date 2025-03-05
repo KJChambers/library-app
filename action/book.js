@@ -59,8 +59,7 @@ export async function AddBook(prevState, formData) {
 	const errors = new Set();
 
 	const titleDescRegex = /^[^<>={}]+$/;
-	const authorsRegex = /^[a-zA-Z0-9\s,.-]+$/;
-	const publisherRegex = /^[a-zA-Z0-9\s,.&-]+$/;
+	const nameRegex = /^[\p{L}\p{N}\s,.&-'`]+$/u;
 
 	if (!ISBN) errors.add("ISBN is required.");
 
@@ -81,9 +80,9 @@ export async function AddBook(prevState, formData) {
 		errors.add("Description contains invalid characters");
 	if (pages && pages < 1)
 		errors.add("Pages cannot be 0 - leave blank if unsure.");
-	if (!authorsRegex.test(authors))
+	if (!nameRegex.test(authors))
 		errors.add("Author(s) contains invalid characters..");
-	if (!publisherRegex.test(publisher))
+	if (!nameRegex.test(publisher))
 		errors.add("Publisher contains invalid characters.");
 
 	if (errors.size > 0)
@@ -148,9 +147,9 @@ export async function editBook(prevState, formData) {
 	const oldISBN = formData.get("oldISBN");
 
 	const errors = new Set();
+
 	const titleDescRegex = /^[^<>={}]+$/;
-	const authorsRegex = /^[a-zA-Z0-9\s,.-]+$/;
-	const publisherRegex = /^[a-zA-Z0-9\s,.&-]+$/;
+	const nameRegex = /^[\p{L}\p{N}\s,.&-'`]+$/u;
 
 	if (!ISBN) errors.add("ISBN is required.");
 	else {
