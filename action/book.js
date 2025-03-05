@@ -166,9 +166,9 @@ export async function editBook(prevState, formData) {
 		);
 	if (pages && pages < 1)
 		errors.add("Pages cannot be 0. Leave blank if unsure.");
-	if (!authorsRegex.test(authors))
+	if (!nameRegex.test(authors))
 		errors.add("Author(s) has invalid characters.");
-	if (!publisherRegex.test(publisher))
+	if (!nameRegex.test(publisher))
 		errors.add("Publisher has invalid characters.");
 
 	if (errors.size > 0) return { errors: Array.from(errors) };
