@@ -10,7 +10,7 @@ import CategoryList from "@/components/book/category-list";
 import CoverImage from "@/components/book/cover-image";
 import { dateFormats } from "@/components/forms/book/date-select";
 import EditBookForm from "@/components/forms/book/edit-book";
-import { fetchAmazon, fetchIsbnTen, fetchWaterstones } from "@/lib/book";
+import { fetchIsbnTen } from "@/lib/book";
 import connectDB from "@/lib/db";
 import { getSession } from "@/lib/get-session";
 import { Book } from "@/models/book";
@@ -57,15 +57,11 @@ export default async function BookInfoPage({ params }) {
 		);
 	}
 
-	const [isbnTen, waterstones, userList, bookEditions] = await Promise.all([
+	const [isbnTen, userList, bookEditions] = await Promise.all([
 		fetchIsbnTen(bookData.ISBN),
-		fetchWaterstones(bookData.ISBN),
 		User.find({ "saved_books.bookId": bookData._id }),
 		Book.find({ "works.key": bookData.works[0].key })
 	]);
-
-	let amazon = { success: false };
-	if (isbnTen) amazon = await fetchAmazon(isbnTen);
 
 	const pubDate = dayjs(bookData.pub_date, dateFormats).format(
 		"DD MMM, YYYY"
@@ -95,35 +91,29 @@ export default async function BookInfoPage({ params }) {
 							) : (
 								<NoUserButton />
 							)}
-							{amazon.success && (
-								<>
-									<a
-										href={amazon.url}
-										className="mx-auto flex w-full cursor-pointer items-center justify-center gap-2 rounded-md bg-white px-2 py-3 text-violet-950 outline-2 outline-gray-300 hover:bg-gray-200 dark:bg-slate-800 dark:text-violet-100 dark:hover:bg-slate-600"
-										rel="noopener noreferrer"
-										target="_blank"
-									>
-										<FaAmazon className="h-6 w-6" />
-										<span className="font-bold">
-											Buy on Amazon
-										</span>
-									</a>
-									<p className="text-xs text-gray-500 text-center">As an Amazon Associate, The Book Chamber earns from qualifying purchases.</p>
-								</>
-							)}
-							{waterstones && (
-								<a
-									href={`https://waterstones.com/book/${ISBN}`}
-									className="mx-auto mb-4 flex w-full cursor-pointer items-center justify-center gap-2 rounded-md bg-white px-2 py-3 text-violet-950 outline-2 outline-gray-300 hover:bg-gray-200 dark:bg-slate-800 dark:text-violet-100 dark:hover:bg-slate-600"
-									rel="noopener noreferrer"
-									target="_blank"
-								>
-									<FaShoppingCart className="h-6 w-6" />
-									<span className="font-bold">
-										Buy on Waterstones
-									</span>
-								</a>
-							)}
+							<a
+								href={`https://amazon.co.uk/s?k=${bookData.title.toLowerCase().replace(/\s/g, '+')}&i=stripbooks&tag=${process.env.AMAZON_TRACKING_ID}&ref=nosim`}
+								className="mx-auto flex w-full cursor-pointer items-center justify-center gap-2 rounded-md bg-white px-2 py-3 text-violet-950 outline-2 outline-gray-300 hover:bg-gray-200 dark:bg-slate-800 dark:text-violet-100 dark:hover:bg-slate-600"
+								rel="noopener noreferrer"
+								target="_blank"
+							>
+								<FaAmazon className="h-6 w-6" />
+								<span className="font-bold">
+									Buy on Amazon
+								</span>
+							</a>
+							<p className="text-xs text-gray-500 text-center">As an Amazon Associate, The Book Chamber earns from qualifying purchases.</p>
+							<a
+								href={`https://waterstones.com/books/search/term/${bookData.title.toLowerCase().replace(/\s/g, '+')}`}
+								className="mx-auto mb-4 flex w-full cursor-pointer items-center justify-center gap-2 rounded-md bg-white px-2 py-3 text-violet-950 outline-2 outline-gray-300 hover:bg-gray-200 dark:bg-slate-800 dark:text-violet-100 dark:hover:bg-slate-600"
+								rel="noopener noreferrer"
+								target="_blank"
+							>
+								<FaShoppingCart className="h-6 w-6" />
+								<span className="font-bold">
+									Buy on Waterstones
+								</span>
+							</a>
 						</div>
 					</div>
 					<div className="col-span-1 space-y-7 px-5 py-3 sm:col-span-2 md:col-span-3">

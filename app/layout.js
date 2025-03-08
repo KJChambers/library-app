@@ -35,8 +35,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
 	return (
 		<html lang="en">
-			<body>
+			<body className="bg-slate-100 dark:bg-slate-800">
 				{children}
+				<span className="hidden">Awin</span>
 				<Analytics />
 			</body>
 		</html>
