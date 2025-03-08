@@ -12,8 +12,8 @@ export function NavLink({ className, href, children }) {
 			href={href}
 			className={
 				path.startsWith(href)
-					? `bg-violet-600 text-violet-50 hover:bg-violet-800 ${className}`
-					: `text-violet-950 hover:text-violet-500 dark:text-violet-100 ${className}`
+					? `hover:text-violet-800 ${className}`
+					: `hover:text-violet-500 dark:text-violet-100 ${className}`
 			}
 		>
 			{children}

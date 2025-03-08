@@ -33,10 +33,10 @@ export default async function Header() {
 	const pages = user
 		? [{ href: "/books", name: "Archives" }]
 		: [
-				{ href: "/books", name: "Archives" },
-				{ href: "/login", name: "Login" },
-				{ href: "/register", name: "Register" }
-			];
+			{ href: "/books", name: "Archives" },
+			{ href: "/login", name: "Login" },
+			{ href: "/register", name: "Register" }
+		];
 
 	return (
 		<header className="bg-white p-6 dark:bg-slate-900">

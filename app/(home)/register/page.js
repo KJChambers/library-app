@@ -6,11 +6,13 @@ import register from "@/action/register";
 import RegisterForm from "@/components/forms/register/register-form";
 import GoogleButton from "@/components/google";
 import { User } from "@/models/user";
+import connectDB from "@/lib/db";
 
 export default async function RegisterPage() {
 	const session = await getSession();
 	const user = session?.user;
 	if (user) {
+		await connectDB();
 		const data = await User.findOne({ email: user.email });
 		redirect(`/profile/${data.username}`);
 	}

@@ -13,19 +13,17 @@ export function RemoveBookButton({ book, user }) {
 	};
 
 	return (
-		<>
-			<button
-				className="mx-auto w-full cursor-pointer justify-center rounded-md bg-red-500 py-3 text-white hover:bg-red-700 disabled:cursor-progress disabled:bg-red-100"
-				onClick={() => handleSubmit()}
-				disabled={isLoading}
-			>
-				{isLoading ? (
-					<span>Removing...</span>
-				) : (
-					<span>Remove from Book Chamber</span>
-				)}
-			</button>
-		</>
+		<button
+			className="mx-auto w-full cursor-pointer justify-center rounded-md bg-red-500 py-3 text-white hover:bg-red-700 disabled:cursor-progress disabled:bg-red-100"
+			onClick={() => handleSubmit()}
+			disabled={isLoading}
+		>
+			{isLoading ? (
+				<span>Removing...</span>
+			) : (
+				<span>Remove from Book Chamber</span>
+			)}
+		</button>
 	);
 }
 

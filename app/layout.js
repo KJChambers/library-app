@@ -1,4 +1,3 @@
-import Header from "@/components/header";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 
@@ -36,8 +35,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
 	return (
 		<html lang="en">
-			<body className="bg-slate-100 dark:bg-slate-800">
-				<Header />
+			<body>
 				{children}
 				<Analytics />
 			</body>
