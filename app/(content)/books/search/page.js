@@ -1,7 +1,7 @@
-import searchBooks from "@/action/search-books";
 import BookList from "@/components/book/book-list";
 import CategoryFilter from "@/components/book/search/filters";
 import SearchBar from "@/components/book/search/search-bar";
+import { searchBooks } from "@/lib/book/search";
 import Link from "next/link";
 
 export default async function SearchResultsPage({ searchParams }) {
