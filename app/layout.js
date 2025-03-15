@@ -35,12 +35,6 @@ export const metadata = {
 export default function RootLayout({ children }) {
 	return (
 		<html lang="en">
-			<head>
-				<script
-					crossOrigin="anonymous"
-					src="//unpkg.com/react-scan/dist/auto.global.js"
-				/>
-			</head>
 			<body className="bg-slate-100 dark:bg-slate-800">
 				{children}
 				<Analytics />
