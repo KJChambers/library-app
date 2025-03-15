@@ -1,15 +1,15 @@
 import jwt from "jsonwebtoken";
 import { BookmarkIcon } from "@heroicons/react/24/outline";
-import { User } from "@/models/user";
 import ResetPasswordForm from "@/components/forms/password/reset-password-form";
 import resetPassword from "@/action/reset-pass";
+import { getUniqueUser } from "@/lib/db";
 
 export default async function PasswordResetPage({ params }) {
 	const { token } = await params;
 	try {
 		const email = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
-		const user = User.findOne({ email });
+		const user = await getUniqueUser("email", email);
 
 		if (!user) {
 			return (

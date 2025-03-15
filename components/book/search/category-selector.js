@@ -1,6 +1,6 @@
 "use client";
 
-import { fiction, nonFiction } from "@/lib/categories";
+import { fiction, nonFiction } from "@/lib/book/categories";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 

@@ -5,77 +5,45 @@ import CategorySelect from "./category-select";
 import NewBookSubmitButton from "./new-book-submit";
 import DateSelect, { dateFormats } from "./date-select";
 import Link from "next/link";
-import { fetchAuthorFromKey, HandleISBN } from "@/action/book";
-import { fetchWorks } from "@/lib/book";
+import { handleIsbnChange } from "@/lib/book/isbn";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 
 export default function NewBookForm({ action, userData }) {
 	const [state, formAction] = useActionState(action, {});
-	const [desc, setDesc] = useState("");
 	const [isbnExists, setIsbnExists] = useState(false);
 	const [isbnTen, setIsbnTen] = useState(false);
-	const [bookData, setBookData] = useState({});
+	const [bookPrev, setBookPrev] = useState({});
 	const [worksData, setWorksData] = useState({});
 	const [authorPrev, setAuthorPrev] = useState("");
-	const [title, setTitle] = useState("");
-	const [publisher, setPublisher] = useState("");
-	const [pubDate, setPubDate] = useState(new Date());
-	const [author, setAuthor] = useState("");
-	const [pages, setPages] = useState(null);
 	const [open, setOpen] = useState(false);
 
-	const handleIsbnChange = async inputISBN => {
-		const cleanISBN = inputISBN.replace(/-/g, "").trim();
-		if (![10, 13].includes(cleanISBN.length)) return resetState();
+	const [formData, setFormData] = useState({
+		title: "",
+		desc: "",
+		authors: "",
+		pages: null,
+		publisher: "",
+		pubDate: new Date()
+	});
 
-		const res = await HandleISBN(cleanISBN);
-
-		setBookData(res.bookData || {});
-		setIsbnTen(res.isbnTen);
-
-		if (res.isbnExists) return setIsbnExists(true);
-		setIsbnExists(false);
-
-		if (res.isbnTen || !res.bookData) return;
-
-		const worksDataRes = res.bookData.works?.[0]?.key
-			? await fetchWorks(res.bookData.works[0].key)
-			: {};
-		setWorksData(worksDataRes);
-
-		const authorKey =
-			res.bookData.authors?.[0]?.key ||
-			worksDataRes.authors?.[0]?.author.key;
-		if (authorKey) {
-			const authorData = await fetchAuthorFromKey(authorKey);
-			setAuthorPrev(
-				authorData.name || authorData.personal_name || "Unknown Author"
-			);
-		}
-		setOpen(true);
+	const formChange = e => {
+		setFormData({ ...formData, [e.target.name]: e.target.value });
 	};
 
 	const autofillData = () => {
-		setTitle(bookData.title || "");
-		setDesc(
-			worksData.description?.value
-				? worksData.description.value
-				: worksData.description || ""
-		);
-		setAuthor(authorPrev || "");
-		setPublisher(bookData.publishers?.[0] || "");
 		dayjs.extend(customParseFormat);
-		setPubDate(
-			dayjs(bookData.publish_date, dateFormats).toDate() || new Date()
-		);
-		setPages(bookData.number_of_pages || "");
-		setOpen(false);
-	};
-
-	const resetState = () => {
-		setIsbnExists(false);
-		setIsbnTen(false);
+		setFormData({
+			title: bookPrev.title || "",
+			desc: worksData.description?.value
+				? worksData.description.value
+				: worksData.description || "",
+			authors: authorPrev || "",
+			pages: bookPrev.number_of_pages || "",
+			publisher: bookPrev.publishers?.[0] || "",
+			pubDate:
+				dayjs(bookPrev.publish_date, dateFormats).toDate() || new Date()
+		});
 		setOpen(false);
 	};
 
@@ -105,7 +73,17 @@ export default function NewBookForm({ action, userData }) {
 						autoComplete="off"
 						placeholder="9780099409960"
 						defaultValue={state.payload?.get("isbn") || ""}
-						onChange={e => handleIsbnChange(e.target.value)}
+						onChange={e =>
+							handleIsbnChange(
+								e.target.value,
+								setBookPrev,
+								setIsbnTen,
+								setIsbnExists,
+								setWorksData,
+								setAuthorPrev,
+								setOpen
+							)
+						}
 						className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-violet-950 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-violet-600 sm:text-sm/6 dark:bg-slate-500 dark:text-violet-100 dark:placeholder:text-violet-100/50 dark:focus:outline-violet-400"
 					/>
 				</div>
@@ -114,7 +92,7 @@ export default function NewBookForm({ action, userData }) {
 						<span>ISBN exists - </span>
 						<Link
 							className="text-violet-700 hover:text-violet-500 dark:text-violet-100 dark:hover:text-violet-300"
-							href={`/books/${bookData.ISBN}`}
+							href={`/books/${bookPrev.ISBN}`}
 						>
 							Go to book page!
 						</Link>
@@ -124,8 +102,8 @@ export default function NewBookForm({ action, userData }) {
 					<div className="text-red-500">
 						<span>
 							Using ISBN-10.{" "}
-							{bookData.isbn_13
-								? `Use ISBN-13: ${bookData.isbn_13?.[0]}`
+							{bookPrev.isbn_13
+								? `Use ISBN-13: ${bookPrev.isbn_13?.[0]}`
 								: "Can't find ISBN-13 for this book!"}
 						</span>
 					</div>
@@ -136,7 +114,7 @@ export default function NewBookForm({ action, userData }) {
 							className="cursor-pointer p-2 hover:bg-gray-100 dark:hover:bg-slate-700"
 							onClick={() => autofillData()}
 						>
-							<p className="font-semibold">{bookData.title}</p>
+							<p className="font-semibold">{bookPrev.title}</p>
 							<p className="text-sm text-gray-600 dark:text-gray-300/80">
 								{authorPrev}
 							</p>
@@ -159,8 +137,8 @@ export default function NewBookForm({ action, userData }) {
 						type="text"
 						autoComplete="off"
 						placeholder="Star Wars: Episode I - The Phantom Menace"
-						value={title}
-						onChange={e => setTitle(e.target.value)}
+						value={formData.title}
+						onChange={formChange}
 						className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-violet-950 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-violet-600 sm:text-sm/6 dark:bg-slate-500 dark:text-violet-100 dark:placeholder:text-violet-100/50 dark:focus:outline-violet-400"
 					/>
 				</div>
@@ -180,14 +158,14 @@ export default function NewBookForm({ action, userData }) {
 						rows={4}
 						maxLength={1600}
 						minLength={10}
-						value={desc}
-						onChange={e => setDesc(e.target.value)}
+						value={formData.desc}
+						onChange={formChange}
 						placeholder="A long time ago in a galaxy far, far away..."
 						className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-violet-950 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-violet-600 sm:text-sm/6 dark:bg-slate-500 dark:text-violet-100 dark:placeholder:text-violet-100/50"
 					/>
 				</div>
 				<p className="text-end text-sm/6 text-gray-600 dark:text-gray-400/80">
-					{desc.length}/1600 characters used
+					{formData.desc.length}/1600 characters used
 				</p>
 			</div>
 
@@ -205,8 +183,8 @@ export default function NewBookForm({ action, userData }) {
 						type="text"
 						autoComplete="on"
 						placeholder="Terry Brooks"
-						value={author}
-						onChange={e => setAuthor(e.target.value)}
+						value={formData.authors}
+						onChange={formChange}
 						className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-violet-950 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-violet-600 sm:text-sm/6 dark:bg-slate-500 dark:text-violet-100 dark:placeholder:text-violet-100/50 dark:focus:outline-violet-400"
 					/>
 				</div>
@@ -227,8 +205,8 @@ export default function NewBookForm({ action, userData }) {
 						autoComplete="off"
 						placeholder="324"
 						min={0}
-						value={pages || ""}
-						onChange={e => setPages(e.target.value)}
+						value={formData.pages || ""}
+						onChange={formChange}
 						className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-violet-950 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-violet-600 sm:text-sm/6 dark:bg-slate-500 dark:text-violet-100 dark:placeholder:text-violet-100/50 dark:focus:outline-violet-400"
 					/>
 				</div>
@@ -248,14 +226,14 @@ export default function NewBookForm({ action, userData }) {
 						type="text"
 						autoComplete="on"
 						placeholder="Arrow Books"
-						value={publisher}
-						onChange={e => setPublisher(e.target.value)}
+						value={formData.publisher}
+						onChange={formChange}
 						className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-violet-950 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-violet-600 sm:text-sm/6 dark:bg-slate-500 dark:text-violet-100 dark:placeholder:text-violet-100/50 dark:focus:outline-violet-400"
 					/>
 				</div>
 			</div>
 
-			<DateSelect date={pubDate} setDate={setPubDate} />
+			<DateSelect formData={formData} setFormData={setFormData} />
 
 			<CategorySelect />
 
@@ -275,7 +253,7 @@ export default function NewBookForm({ action, userData }) {
 			<input type="hidden" value={userData.username} name="username" />
 			<input
 				type="hidden"
-				value={bookData?.works?.[0]?.key || ""}
+				value={bookPrev?.works?.[0]?.key || ""}
 				name="works"
 			/>
 		</form>

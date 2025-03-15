@@ -5,13 +5,13 @@ import { redirect } from "next/navigation";
 import { BookmarkIcon } from "@heroicons/react/24/outline";
 import LoginForm from "@/components/forms/login/login-form";
 import GoogleButton from "@/components/google";
-import { User } from "@/models/user";
+import { getUniqueUser } from "@/lib/db";
 
 export default async function LoginPage() {
 	const session = await getSession();
 	const user = session?.user;
 	if (user) {
-		const data = await User.findOne({ email: user.email });
+		const data = await getUniqueUser("email", user.email);
 		redirect(`/profile/${data.username}`);
 	}
 

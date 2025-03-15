@@ -1,6 +1,6 @@
 "use server";
 
-import connectDB from "@/lib/db";
+import connectDB, { getUniqueUser } from "@/lib/db";
 import { User } from "@/models/user";
 import { redirect } from "next/navigation";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
@@ -141,8 +141,7 @@ async function updateUserSocials(prevState, formData) {
 		return { errors, payload: formData };
 	}
 
-	await connectDB();
-	const user = await User.findOne({ email });
+	const user = await getUniqueUser("email", email);
 
 	const socials = ["facebook", "linkedin", "instagram", "github"];
 

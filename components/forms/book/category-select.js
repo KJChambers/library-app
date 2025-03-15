@@ -1,6 +1,6 @@
 "use client";
 
-import categories from "@/lib/categories";
+import categories from "@/lib/book/categories";
 import { useState } from "react";
 
 export default function CategorySelect() {

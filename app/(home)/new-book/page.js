@@ -1,8 +1,7 @@
 import { AddBook } from "@/action/book";
 import NewBookForm from "@/components/forms/book/new-book-form";
-import connectDB from "@/lib/db";
+import { getUniqueUser } from "@/lib/db";
 import { getSession } from "@/lib/get-session";
-import { User } from "@/models/user";
 import { BookmarkIcon } from "@heroicons/react/24/outline";
 import { redirect } from "next/navigation";
 
@@ -10,8 +9,7 @@ export default async function NewBookPage() {
 	const session = await getSession();
 	const user = session?.user;
 	if (!user) redirect("/login");
-	await connectDB();
-	const userData = await User.findOne({ email: user.email });
+	const userData = await getUniqueUser("email", user.email);
 
 	return (
 		<div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">

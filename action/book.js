@@ -7,41 +7,6 @@ import { revalidatePath } from "next/cache";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { redirect } from "next/navigation";
 
-export async function SearchRedirect() {
-	redirect("/books");
-}
-
-export async function AddBookRedirect() {
-	redirect("/new-book");
-}
-
-export async function HandleISBN(ISBN) {
-	await connectDB();
-	const existingBook = await Book.findOne({ ISBN }).lean();
-	if (existingBook)
-		return {
-			isbnExists: true,
-			bookData: JSON.parse(JSON.stringify(existingBook)),
-			isbnTen: false
-		};
-
-	const res = await fetch(`https://openlibrary.org/isbn/${ISBN}.json`);
-	if (res.status !== 200) return { isbnExists: false, bookData: null };
-
-	const bookData = await res.json();
-	return {
-		isbnExists: false,
-		bookData,
-		isbnTen: bookData.isbn_10?.includes(ISBN.toUpperCase())
-	};
-}
-
-export async function fetchAuthorFromKey(key) {
-	const res = await fetch(`https://openlibrary.org/${key}.json`);
-	if (res.status !== 200) return;
-	return await res.json();
-}
-
 export async function AddBook(prevState, formData) {
 	const title = formData.get("title")?.trim(); // required
 	const authors = formData.get("authors")?.trim() || "Unknown";
@@ -135,10 +100,10 @@ export async function AddBook(prevState, formData) {
 }
 
 export async function editBook(prevState, formData) {
-	const ISBN = formData.get("isbn").trim();
-	const title = formData.get("title").trim();
-	const desc = formData.get("desc").trim();
-	const authors = formData.get("authors").trim() || "Unknown";
+	const ISBN = formData.get("isbn")?.trim();
+	const title = formData.get("title")?.trim();
+	const desc = formData.get("desc")?.trim();
+	const authors = formData.get("authors")?.trim() || "Unknown";
 	const pages = parseInt(formData.get("pages"), 10) || null;
 	const publisher = formData.get("publisher")?.trim() || "Unknown";
 	const pubDate = formData.get("pubDate")
@@ -159,10 +124,10 @@ export async function editBook(prevState, formData) {
 	}
 
 	if (!title || !titleDescRegex.test(title))
-		errors.add("Title must be present and not contain invalid characters");
+		errors.add("Title must be present and not contain invalid characters.");
 	if (!desc || desc.length < 25 || !titleDescRegex.test(desc))
 		errors.add(
-			"Description must be at least 25 characters and not contain invalid letters"
+			"Description must be at least 25 characters and not contain invalid characters."
 		);
 	if (pages && pages < 1)
 		errors.add("Pages cannot be 0. Leave blank if unsure.");
@@ -181,7 +146,7 @@ export async function editBook(prevState, formData) {
 	]);
 
 	if (existingBook && oldISBN !== cleanedISBN)
-		return { errors: ["ISBN already exists"] };
+		return { errors: ["ISBN already exists."] };
 
 	if (oldBookData) {
 		const updatedFields = {};

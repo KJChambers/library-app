@@ -1,27 +1,18 @@
 import { updateUserProfile, updateUserSocials } from "@/action/update-profile";
 import EditProfileForm from "@/components/forms/profile/edit-profile-form";
 import EditSocialsForm from "@/components/forms/profile/edit-socials-form";
-import connectDB from "@/lib/db";
+import { getUniqueUser } from "@/lib/db";
 import { getSession } from "@/lib/get-session";
-import { User } from "@/models/user";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 export default async function EditProfilePage({ params }) {
-	const { username } = await params;
-	await connectDB();
-
-	const [profileData, session] = await Promise.all([
-		User.findOne({ username }),
-		getSession()
-	]);
-
-	if (!profileData) notFound();
+	const [{ username }, session] = await Promise.all([params, getSession()]);
 
 	const user = session?.user;
-	if (!user) redirect("/login");
+	const userData = await getUniqueUser("email", user.email);
 
-	const userData = await User.findOne({ email: user.email });
+	if (!userData) notFound();
 	if (userData?.username !== username) redirect(`/profile/${username}`);
 
 	return (

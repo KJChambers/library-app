@@ -10,7 +10,7 @@ import CategoryList from "@/components/book/category-list";
 import CoverImage from "@/components/book/cover-image";
 import { dateFormats } from "@/components/forms/book/date-select";
 import EditBookForm from "@/components/forms/book/edit-book";
-import { fetchIsbnTen } from "@/lib/book";
+import { fetchIsbnTen } from "@/lib/book/book";
 import connectDB from "@/lib/db";
 import { getSession } from "@/lib/get-session";
 import { Book } from "@/models/book";

@@ -2,7 +2,7 @@
 
 import { Dialog, DialogPanel } from "@headlessui/react";
 import { useState } from "react";
-import { fiction, nonFiction } from "@/lib/categories";
+import { fiction, nonFiction } from "@/lib/book/categories";
 import { FaPlus } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 

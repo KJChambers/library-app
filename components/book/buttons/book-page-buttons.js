@@ -1,6 +1,6 @@
 "use client";
 
-import { AddExistingBook, removeBook } from "@/lib/book";
+import { AddExistingBook, removeBook } from "@/lib/book/book";
 import Link from "next/link";
 import { useState } from "react";
 

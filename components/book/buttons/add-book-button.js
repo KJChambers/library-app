@@ -1,16 +1,16 @@
 "use client";
 
-import { AddBookRedirect, SearchRedirect } from "@/action/book";
 import {
-	Description,
 	Dialog,
 	DialogPanel,
 	DialogTitle
 } from "@headlessui/react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function AddBookButton() {
 	let [isOpen, setIsOpen] = useState(false);
+	const router = useRouter();
 
 	return (
 		<>
@@ -39,22 +39,20 @@ export default function AddBookButton() {
 							Choose how you would like to add a book
 						</p>
 						<div className="flex justify-center gap-4">
-							<form action={SearchRedirect}>
-								<button
-									type="submit"
-									className="mt-2 cursor-pointer rounded-md bg-violet-600 px-3 py-2 font-semibold text-violet-100 shadow-xs hover:bg-violet-500 dark:bg-violet-700 dark:hover:bg-violet-600"
-								>
-									Search Archives
-								</button>
-							</form>
-							<form action={AddBookRedirect}>
-								<button
-									type="submit"
-									className="mt-2 cursor-pointer rounded-md px-3 py-2 font-semibold text-violet-950 hover:bg-gray-300/50 hover:shadow-xs dark:text-violet-100 dark:hover:bg-gray-500/50"
-								>
-									Add Manually
-								</button>
-							</form>
+							<button
+								type="submit"
+								onClick={() => router.push("/books")}
+								className="mt-2 cursor-pointer rounded-md bg-violet-600 px-3 py-2 font-semibold text-violet-100 shadow-xs hover:bg-violet-500 dark:bg-violet-700 dark:hover:bg-violet-600"
+							>
+								Search Archives
+							</button>
+							<button
+								type="submit"
+								onClick={() => router.push("/new-book")}
+								className="mt-2 cursor-pointer rounded-md px-3 py-2 font-semibold text-violet-950 hover:bg-gray-300/50 hover:shadow-xs dark:text-violet-100 dark:hover:bg-gray-500/50"
+							>
+								Add Manually
+							</button>
 						</div>
 					</DialogPanel>
 				</div>

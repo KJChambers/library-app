@@ -4,7 +4,7 @@ import DatePicker, { registerLocale } from "react-datepicker";
 import { enGB } from "date-fns/locale/en-GB";
 import "react-datepicker/dist/react-datepicker.css";
 
-export default function DateSelect({ date, setDate }) {
+export default function DateSelect({ formData, setFormData }) {
 	registerLocale("gb", enGB);
 
 	return (
@@ -26,8 +26,10 @@ export default function DateSelect({ date, setDate }) {
 			<div className="mt-2">
 				<DatePicker
 					locale="gb"
-					selected={date}
-					onChange={date => setDate(date)}
+					selected={formData.pubDate}
+					onChange={date =>
+						setFormData({ ...formData, pubDate: date })
+					}
 					dateFormat="dd-MM-yyyy"
 					maxDate={new Date()}
 					minDate={new Date("1970-01-01")}
@@ -40,7 +42,7 @@ export default function DateSelect({ date, setDate }) {
 				<input
 					type="hidden"
 					name="pubDate"
-					value={date.toISOString()}
+					value={formData.pubDate.toISOString()}
 				/>
 			</div>
 		</div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import CoverImage from "./cover-image";
 
 export default function BookList({
@@ -20,10 +20,15 @@ export default function BookList({
 
 	const router = useRouter();
 	const [visibleCount, setVisibleCount] = useState(8);
+	const computedClassName = useMemo(
+		() =>
+			`mt-10 ${className} text-center text-violet-950 md:text-left dark:text-violet-100`,
+		[className]
+	);
 
-	const showMoreBooks = () => {
-		setVisibleCount(prev => prev + 4);
-	};
+	const showMoreBooks = useCallback(() => {
+		setVisibleCount(prev => Math.min(prev + 4, books.length));
+	}, []);
 
 	useEffect(() => {
 		if (!scrollable) return;
@@ -31,18 +36,19 @@ export default function BookList({
 		const handleScroll = () => {
 			if (
 				window.innerHeight + window.scrollY >=
-				document.body.offsetHeight - 50
+				document.body.offsetHeight - 50 &&
+				visibleCount < books.length
 			)
 				showMoreBooks();
 		};
 
 		window.addEventListener("scroll", handleScroll);
 		return () => window.removeEventListener("scroll", handleScroll);
-	}, [scrollable]);
+	}, [scrollable, showMoreBooks]);
 
 	return (
 		<div
-			className={`mt-10 ${className} text-center text-violet-950 md:text-left dark:text-violet-100`}
+			className={computedClassName}
 		>
 			{books.slice(0, visibleCount).map(book => (
 				<div

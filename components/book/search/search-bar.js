@@ -1,6 +1,6 @@
 "use client";
 
-import searchBooks from "@/action/search-books";
+import { searchBooks } from "@/lib/book/search";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -9,36 +9,51 @@ export default function SearchBar({
 	initialQuery = "",
 	category = null,
 	inputClasses = "",
-	clearable = false
+	clearable = false,
+	className = ""
 }) {
 	const [query, setQuery] = useState(initialQuery);
 	const [results, setResults] = useState([]);
 	const [open, setOpen] = useState(false);
 	const [isPending, startTransition] = useTransition();
 	const router = useRouter();
+	const computedInputClasses = `w-full rounded-l-md border border-gray-300 p-2 focus:outline-none ${inputClasses}`;
+	const computedClassName = `relative mx-auto max-w-md ${className}`;
 
 	const handleSearch = e => {
 		e.preventDefault();
 		if (!query.trim()) return;
 		router.push(
-			`/books/search?query=${query.trim().replaceAll(" ", "-")}${category ? `&category=${category.replaceAll(" ", "-").replace("&", "%26")}` : ``}`
+			`/books/search?query=${query.trim().replaceAll(" ", "-").replaceAll("&", "%26")}${category ? `&category=${category.replaceAll(" ", "-").replace("&", "%26")}` : ``}`
+		);
+	};
+
+	const areArraysEqual = (arr1, arr2) => {
+		if (arr1.length !== arr2.length) return false;
+		return arr1.every(
+			(obj1, index) =>
+				JSON.stringify(obj1) === JSON.stringify(arr2[index])
 		);
 	};
 
 	const handleInputChange = e => {
-		setQuery(e.target.value);
+		const query = e.target.value;
+		setQuery(query);
 
-		if (e.target.value.trim() === "") {
-			setResults([]);
-			setOpen(false);
+		if (!query.trim()) {
+			if (results.length !== 0) setResults([]);
+			if (open) setOpen(false);
 			return;
 		}
 
 		startTransition(async () => {
-			const books = await searchBooks(e.target.value, {}, 4);
-			setResults(JSON.parse(books));
-			setOpen(true);
+			const books = JSON.parse(await searchBooks(query, {}, 4));
+			setResults(prevResults =>
+				areArraysEqual(prevResults, books) ? prevResults : books
+			);
 		});
+
+		if (!open) setOpen(true);
 	};
 
 	const handleClear = () => {
@@ -49,7 +64,7 @@ export default function SearchBar({
 	};
 
 	return (
-		<div className="relative mx-auto max-w-md">
+		<div className={computedClassName}>
 			<div className="flex items-center gap-4">
 				<form onSubmit={handleSearch} className="flex flex-grow">
 					<input
@@ -58,7 +73,7 @@ export default function SearchBar({
 						onChange={handleInputChange}
 						onBlur={() => setTimeout(() => setOpen(false), 200)}
 						placeholder="Search for a book..."
-						className={`w-full rounded-l-md border border-gray-300 p-2 focus:outline-none ${inputClasses}`}
+						className={computedInputClasses}
 					/>
 					<button
 						type="submit"
