@@ -14,7 +14,8 @@ const nextConfig = {
 				port: ""
 			}
 		]
-	}
+	},
+	experimental: { forceSwcTransforms: true }
 };
 
 export default nextConfig;
