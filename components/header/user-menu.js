@@ -12,6 +12,7 @@ export function UserMenu({ userData }) {
 		<div className="relative">
 			<button
 				onClick={() => setIsOpen(prev => !prev)}
+				onBlur={() => setTimeout(() => setIsOpen(prev => prev === true ? !prev : prev), 200)}
 				className="relative ms-5 flex cursor-pointer rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
 			>
 				<span className="sr-only">Open user menu</span>
@@ -25,7 +26,9 @@ export function UserMenu({ userData }) {
 				/>
 			</button>
 			{isOpen && (
-				<div className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 dark:bg-slate-500">
+				<div
+					className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 dark:bg-slate-500"
+				>
 					<Link
 						href={`/profile/${userData.username}`}
 						className="block px-4 py-2 text-sm text-violet-950 hover:bg-gray-100 dark:text-violet-100 dark:hover:bg-slate-700"

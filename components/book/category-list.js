@@ -72,6 +72,7 @@ export default function CategoryList({ book, user }) {
 						<button
 							onClick={() => setOpen(true)}
 							className="ml-2 cursor-pointer text-violet-500 hover:text-violet-700"
+							data-testid="open-modal"
 						>
 							<FaPlus className="h-5 w-5" />
 						</button>

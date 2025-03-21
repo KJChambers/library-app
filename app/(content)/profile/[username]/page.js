@@ -6,8 +6,9 @@ import connectDB from "@/lib/db";
 import Link from "next/link";
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
 import SocialLinks from "@/components/social-links";
-import BookChamber from "@/components/book/book-chamber";
 import AddBookButton from "@/components/book/buttons/add-book-button";
+import BookList from "@/components/book/book-list";
+import { Book } from "@/models/book";
 
 export default async function ProfilePage({ params }) {
 	const { username } = await params;
@@ -24,6 +25,9 @@ export default async function ProfilePage({ params }) {
 		? (await User.findOne({ email: session.user.email }))?.username ===
 			username
 		: false;
+
+	const bookIds = profileData.saved_books.map(entry => entry.bookId);
+	const bookList = await Book.find({ _id: { $in: bookIds } });
 
 	return (
 		<div className="mx-auto mt-7 grid max-w-lg grid-cols-1 gap-7 lg:max-w-5xl lg:grid-cols-3">
@@ -85,8 +89,10 @@ export default async function ProfilePage({ params }) {
 					<AddBookButton />
 				</div>
 
-				<BookChamber
-					userData={JSON.parse(JSON.stringify(profileData))}
+				<BookList
+					books={JSON.parse(JSON.stringify(bookList))}
+					className="grid grid-cols-1 justify-items-stretch gap-10 md:grid-cols-2 lg:grid-cols-4"
+					scrollable
 				/>
 			</div>
 		</div>

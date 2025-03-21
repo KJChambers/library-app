@@ -6,14 +6,14 @@ import CoverImage from "./cover-image";
 
 export default function BookList({
 	books,
-	className,
+	className = "",
 	publisher = false,
 	date = false,
 	scrollable = false
 }) {
 	if (books.length === 0)
 		return (
-			<p className="col-span-full text-center text-violet-950 dark:text-violet-100">
+			<p className="col-span-full mt-3 text-center text-violet-950 dark:text-violet-100">
 				No books to show!
 			</p>
 		);
@@ -36,7 +36,7 @@ export default function BookList({
 		const handleScroll = () => {
 			if (
 				window.innerHeight + window.scrollY >=
-				document.body.offsetHeight - 50 &&
+					document.body.offsetHeight - 50 &&
 				visibleCount < books.length
 			)
 				showMoreBooks();
@@ -47,9 +47,7 @@ export default function BookList({
 	}, [scrollable, showMoreBooks]);
 
 	return (
-		<div
-			className={computedClassName}
-		>
+		<div className={computedClassName}>
 			{books.slice(0, visibleCount).map(book => (
 				<div
 					key={book._id}
